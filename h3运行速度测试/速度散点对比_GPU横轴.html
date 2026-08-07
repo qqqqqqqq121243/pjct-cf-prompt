@@ -1,0 +1,383 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>社区实测 H3 生成速度散点对比（GPU 横轴）</title>
+<style>
+:root{--bg:#07121f;--panel:#0d1d30;--line:#243b58;--text:#eef5ff;--mute:#99adc6;--cyan:#55d8ff;--gold:#ffcc66;--pink:#ff759f}
+*{box-sizing:border-box}
+body{margin:0;background:radial-gradient(circle at 83% 0,#193858 0,transparent 38%),linear-gradient(135deg,#0b1b2d,#07121f 58%,#0a192a);color:var(--text);font:14px/1.5 Inter,"Microsoft YaHei",Arial}
+.wrap{max-width:1780px;margin:0 auto;padding:30px 26px 60px}
+.eyebrow{font-size:12px;font-weight:bold;letter-spacing:1.2px;color:var(--cyan)}
+h1{font-size:28px;margin:5px 0 2px}
+h2{font-size:17px;margin:0 0 4px}
+p{color:var(--mute);margin:2px 0}
+.kpis{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin:20px 0}
+.kpi{background:linear-gradient(145deg,#11243b,#0c192a);border:1px solid var(--line);border-radius:12px;padding:13px 15px}
+.kpi span{font-size:12px;color:var(--mute)}
+.kpi b{display:block;font-size:20px;color:var(--cyan);margin:2px 0}
+.panel{background:linear-gradient(145deg,#11243b,#0c192a);border:1px solid var(--line);border-radius:13px;padding:18px 20px;margin-top:14px}
+.filters{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin:8px 0 4px}
+.filters b{margin:0 4px 0 10px;color:var(--mute);font-size:12px}
+.filters button{background:#10243a;border:1px solid #355679;border-radius:14px;color:#bcd0e5;padding:4px 10px;cursor:pointer;font-size:12px}
+.filters button.active{background:#15566d;color:#fff;border-color:var(--cyan)}
+#chart{overflow-x:auto}
+.chart-svg{display:block;min-width:1700px}
+.legend{display:flex;flex-wrap:wrap;gap:16px;align-items:center;color:var(--mute);font-size:12px;margin-top:10px}
+.dot{display:inline-block;width:11px;height:11px;border-radius:50%;margin-right:5px;vertical-align:-1px}
+.diamond{display:inline-block;width:10px;height:10px;background:transparent;border:2px solid #ffcc66;transform:rotate(45deg);margin-right:5px;vertical-align:-1px}
+#tip{position:fixed;pointer-events:none;background:#0a1a2c;border:1px solid #355679;border-radius:9px;padding:8px 11px;font-size:12px;color:var(--text);box-shadow:0 4px 16px rgba(0,0,0,.45);display:none;z-index:9;max-width:300px;line-height:1.55}
+#tip b{color:#fff}
+#tip .mp{color:var(--cyan)}
+#tip .t{color:var(--gold);font-weight:bold}
+.tablebox{overflow:auto;max-height:520px;margin-top:8px}
+table{width:100%;border-collapse:collapse;font-size:12px}
+th{position:sticky;top:0;background:#0e1e32;color:#90a9c4;text-align:left}
+th,td{padding:8px 9px;border-bottom:1px solid #203650;white-space:nowrap}
+.tag{padding:1px 6px;border-radius:5px;background:#1d3854;margin-right:3px;font-size:11px}
+.insight{border-left:3px solid var(--gold);padding-left:12px;margin:10px 0;color:#b7c8dc}
+.tick-text{fill:#7f99b6;font-size:11px}
+.gpu-label{fill:#cfe0f2;font-size:11.5px;font-weight:600}
+.gpu-label small{fill:#8299b3;font-weight:400}
+.grid{stroke:#1f3651}
+.cursor{cursor:pointer}
+@media(max-width:1000px){.kpis{grid-template-columns:repeat(2,1fr)}h1{font-size:23px}}
+</style>
+</head>
+<body><div class="wrap">
+
+<section>
+<div class="eyebrow">COMMUNITY BENCHMARK · 原始实测秒数直出</div>
+<h1>社区实测 H3 生成速度散点对比（显卡为横轴）</h1>
+<p>纵轴 = 生成用时（秒，对数刻度）；气泡大小 = 分辨率 MP；颜色 = 参考类型。横轴按各显卡<b style="color:#fff">中位用时</b>从左到右升序。</p>
+</section>
+
+<section class="kpis" id="kpis"></section>
+
+<section class="panel">
+<h2>全样本散点图</h2>
+<p>菱形 = 汇总行（该口径样本&gt;3，只画中位数，共 4 条）；空心虚线圆 = 分辨率未注明。</p>
+<div class="filters" id="refF">
+<b>参考类型</b>
+<button data-v="all" class="active">全部</button>
+<button data-v="i2v">i2v 图参考</button>
+<button data-v="t2v">t2v 文生</button>
+<button data-v="v2v">v2v 视频参考</button>
+<button data-v="不明">未注明</button>
+</div>
+<div class="filters" id="durF">
+<b>视频时长</b>
+<button data-v="all" class="active">全部</button><span id="durBtns"></span>
+</div>
+<div class="legend">
+<span><i class="dot" style="background:#55d8ff"></i>i2v 图参考</span>
+<span><i class="dot" style="background:#ffcc66"></i>t2v 文生</span>
+<span><i class="dot" style="background:#ff759f"></i>v2v 视频参考</span>
+<span><i class="dot" style="background:#8fa7c2"></i>未注明</span>
+<span style="margin-left:12px">气泡大小：<svg width="128" height="24" style="vertical-align:-6px"><circle cx="14" cy="12" r="5" fill="#55d8ff" opacity=".75"/><text x="24" y="16" fill="#8fa7c2" font-size="11">0.4MP</text><circle cx="64" cy="12" r="10.5" fill="#55d8ff" opacity=".75"/><text x="79" y="16" fill="#8fa7c2" font-size="11">1MP</text><circle cx="116" cy="12" r="16" fill="#55d8ff" opacity=".75"/></svg></span>
+<span><i class="diamond"></i>汇总行（中位数）</span>
+</div>
+<div id="chart"><svg class="chart-svg" id="svg" width="1700" height="700"></svg></div>
+<div class="insight"><b style="color:#fff">怎么读：</b>同一张卡的气泡越靠上越慢；用时相近时气泡越大说明分辨率越高（更重）；v2v(视频参考) 普遍比同配置其它类型慢一截，比较时应只看同参考类型。本图是<b>原始秒数</b>直接展示，未除以 6000PRO 基准；时长、分辨率不同，不能直接判快慢。</div>
+</section>
+
+<section class="panel">
+<h2>按显卡汇总</h2>
+<p>中位用时 / 最快~最慢 / 口径数 = GPU×MP×时长的组合数。</p>
+<div class="tablebox"><table>
+<thead><tr><th>#</th><th>显卡</th><th>样本数</th><th>中位用时</th><th>最快 ~ 最慢</th><th>口径数</th><th>参考类型构成</th></tr></thead>
+<tbody id="tbody"></tbody>
+</table></div>
+</section>
+
+</div>
+<div id="tip"></div>
+
+<script>
+/* 台账数据：[显卡, 分辨率MP(字符串或null), 视频时长, 参考类型, 用时]。
+   用时为数组=单条上报秒数；为数字=汇总行中位数秒数，此时第6个元素=样本数。 */
+const ROWS=[
+["2080ti","0.4MP","5s","不明",1122,4],
+["2080ti",null,"15s","t2v",[780]],
+["3050ti",null,"5s","不明",[900]],
+["3060","0.3MP","5s","不明",[367]],
+["3060","0.4MP","5s","i2v",[600,600]],
+["3060","0.4MP","5s","不明",[180]],
+["3060","0.4MP","10s","i2v",[800,1200]],
+["3060","0.4MP","15s","i2v",[1800]],
+["3060","0.5MP","5s","不明",[900]],
+["3060","0.8MP","10s","不明",[1860,4200]],
+["3060","1MP","10s","不明",[3600]],
+["3060",null,"5s","i2v",[389]],
+["3060",null,"5s","不明",[600]],
+["3060",null,"10s","不明",[1500]],
+["3060笔电","0.4MP","5s","不明",[300]],
+["3060laptop","0.3MP","10s","不明",[15000]],
+["3060laptop","0.4MP","5s","不明",[1200]],
+["3060laptop",null,"5s","不明",[2640]],
+["3060ti","0.4MP","5s","不明",[325,732]],
+["3060ti","0.4MP","15s","不明",[1500]],
+["3060ti","0.9MP","5s","不明",[965]],
+["3070","0.1MP","4s","不明",[300]],
+["3070","0.4MP","3s","v2v",[780]],
+["3070","0.5MP","8s","t2v",[2820]],
+["3070",null,"9s","不明",[930]],
+["3070ti笔记本","0.4MP","5s","不明",[660]],
+["3080","0.4MP","5s","不明",[300,340,360]],
+["3080","0.4MP","8s","不明",[960]],
+["3080","0.4MP","10s","不明",[600,840]],
+["3080","0.4MP","15s","i2v",[860]],
+["3080","0.5MP","5s","i2v",[300,480]],
+["3080","0.9MP","4s","不明",[600]],
+["3080","1MP","8s","i2v",[2981]],
+["3080",null,"4s","不明",[420]],
+["3080笔记本",null,"5s","不明",[1800]],
+["3080ti","0.4MP","5s","不明",[300,480]],
+["3080ti","0.4MP","5s","v2v",[1800]],
+["3080ti","0.4MP","15s","i2v",[660,1200,1770]],
+["3090","0.4MP","5s","不明",570,4],
+["3090","0.4MP","5s","t2v",[488]],
+["3090","0.4MP","10s","不明",[490]],
+["3090","0.4MP","10s","t2v",[1092]],
+["3090","0.4MP","15s","不明",[919]],
+["3090","0.6MP","15s","不明",[3000]],
+["3090","1MP","5s","不明",[735]],
+["3090","1MP","10s","不明",[2179]],
+["3090","1MP","15s","不明",[4260]],
+["4050","0.4MP","5s","不明",[900]],
+["4060","0.2MP","5s","不明",[540,553]],
+["4060","0.4MP","5s","t2v",[342,600]],
+["4060","0.4MP","5s","i2v",[385,720]],
+["4060","0.4MP","5s","不明",[600]],
+["4060","0.4MP","15s","不明",[1200]],
+["4060","0.5MP","8s","i2v",[780]],
+["4060","0.9MP","10s","不明",[1800]],
+["4060","1MP","5s","不明",[600]],
+["4060","1MP","6s","不明",[3700]],
+["4060",null,"5s","不明",[600]],
+["4060",null,"10s","不明",[1500]],
+["4060laptop","0.3MP","5s","i2v",[480]],
+["4060laptop","0.4MP","5s","不明",[300,375]],
+["4060laptop","0.5MP","8s","不明",[540]],
+["4060ti","0.4MP","5s","不明",[183,560,600]],
+["4060ti","0.4MP","5s","i2v",[334]],
+["4060ti","0.4MP","10s","不明",[1200,1260]],
+["4060ti","0.4MP","15s","不明",[2500]],
+["4060ti","0.5MP","10s","不明",[2400]],
+["4060ti","0.5MP","15s","不明",[780]],
+["4060ti",null,"5s","不明",[178]],
+["4070","0.4MP","5s","不明",[160,300]],
+["4070","0.4MP","8s","不明",[780]],
+["4070","0.7MP","10s","t2v",[1000]],
+["4070","0.8MP","10s","t2v",[1114]],
+["4070",null,"5s","不明",[193,270]],
+["4070s","0.4MP","5s","不明",[450,2400]],
+["4070s","0.4MP","5s","i2v",[271,780]],
+["4070s","0.4MP","8s","i2v",[551]],
+["4070s","0.4MP","10s","不明",[840]],
+["4070s","0.4MP","15s","不明",[900,1440]],
+["4070s","0.4MP","15s","i2v",[550]],
+["4070s",null,"5s","不明",[200,250]],
+["4070super","0.4MP","5s","不明",[107]],
+["4070super","0.9MP","5s","不明",[273]],
+["4070ti","0.4MP","5s","不明",[480,600]],
+["4070ti","0.4MP","10s","不明",[300]],
+["4070ti","1MP","5s","不明",[300,3600]],
+["4070tis","0.4MP","5s","不明",[600]],
+["4070tis","0.4MP","10s","不明",[600]],
+["4070tis",null,"5s","不明",[1200]],
+["4070tisuper","0.4MP","5s","不明",[3000]],
+["4080","0.4MP","5s","不明",[102,180,200]],
+["4080","0.4MP","10s","i2v",[480]],
+["4080","0.5MP","15s","不明",[660]],
+["4080","0.6MP","5s","不明",[400,530]],
+["4080",null,"5s","不明",[180]],
+["4080",null,"10s","t2v",[600]],
+["4080",null,"11s","v2v",[6000]],
+["4080",null,"15s","不明",[330]],
+["4080S","0.4MP","10s","不明",[1200]],
+["4080ti(原文)","0.4MP","5s","不明",[450]],
+["4090","0.4MP","5s","不明",[44,64,130]],
+["4090","0.4MP","10s","不明",[200,230]],
+["4090","0.4MP","15s","i2v",[300]],
+["4090","0.4MP","20s","不明",[14400]],
+["4090","0.5MP","10s","i2v",[720]],
+["4090","0.9MP","10s","不明",[600,1200]],
+["4090","0.9MP","15s","不明",[3000]],
+["4090","1MP","5s","不明",[660]],
+["4090","1MP","10s","不明",[600,1200,1200]],
+["4090",null,"5s","不明",[1200]],
+["4090",null,"5s","i2v",[120]],
+["4090laptop","2MP","9s","不明",[1800]],
+["5060","0.4MP","5s","i2v",[420]],
+["5060","0.9MP","5s","i2v",[1620]],
+["5060",null,"5s","i2v",[480]],
+["5060",null,"5s","不明",[525]],
+["5060移动端","0.4MP","5s","i2v",[300]],
+["5060ti","0.4MP","5s","不明",372,8],
+["5060ti","0.4MP","5s","i2v",[153]],
+["5060ti","0.4MP","5s","t2v",[240]],
+["5060ti","0.4MP","10s","不明",[1560]],
+["5060ti","0.4MP","15s","不明",[1800]],
+["5060ti","0.6MP","5s","不明",[700]],
+["5060ti","0.6MP","10s","不明",[537]],
+["5060ti","1MP","4s","不明",[560]],
+["5060ti","1MP","10s","t2v",[900]],
+["5060ti","1MP","10s","i2v",[1020]],
+["5060ti",null,"5s","不明",[200]],
+["5060ti",null,"5s","v2v",[1200]],
+["5060ti",null,"9s","不明",[1500]],
+["5060ti",null,"10s","不明",[500,1560]],
+["5070","0.3MP","3s","不明",[300]],
+["5070","1MP","5s","不明",[1140]],
+["5070","1MP","10s","不明",[1440]],
+["5070移动端","0.4MP","5s","i2v",[377,380]],
+["5070laptop","0.4MP","10s","不明",[14400]],
+["5070laptop","0.4MP","15s","不明",[1500]],
+["5070ti","0.3MP","5s","不明",[113]],
+["5070ti","0.4MP","5s","不明",[230,720]],
+["5070ti","0.4MP","8s","不明",[600]],
+["5070ti","0.5MP","5s","不明",[70]],
+["5070ti","0.5MP","8s","不明",[200,255]],
+["5070ti","0.5MP","10s","不明",[600]],
+["5070ti","0.6MP","9s","i2v",[720]],
+["5070ti","0.6MP","15s","不明",[2100]],
+["5070ti","0.7MP","10s","不明",[590]],
+["5070ti","1MP","5s","不明",[791,1380]],
+["5070ti",null,"5s","不明",[120,240]],
+["5070ti",null,"9s","不明",[150]],
+["5070ti",null,"10s","不明",[160]],
+["5070ti",null,"15s","i2v",[9970]],
+["5070tilaptop","0.4MP","5s","不明",[400]],
+["5080","0.2MP","5s","不明",[60]],
+["5080","0.4MP","5s","不明",[160,374,375]],
+["5080","0.4MP","10s","不明",[300,600]],
+["5080","0.5MP","8s","不明",[450]],
+["5080","0.6MP","10s","不明",[470]],
+["5080","0.6MP","12s","不明",[600,634]],
+["5080","0.6MP","15s","不明",[780]],
+["5080","0.7MP","15s","不明",[1020]],
+["5080","0.8MP","7s","不明",[300]],
+["5080","0.8MP","12s","不明",[1200]],
+["5080","0.9MP","5s","不明",[324]],
+["5080","0.9MP","10s","不明",[660]],
+["5080","1MP","10s","不明",[460,900]],
+["5080","1MP","15s","不明",[18000]],
+["5080","2MP","5s","不明",[900]],
+["5090","0.4MP","5s","不明",120,5],
+["5090","0.4MP","5s","t2v",[581]],
+["5090","0.4MP","10s","t2v",[1277]],
+["5090","0.4MP","15s","不明",[1800]],
+["5090","0.4MP","15s","t2v",[150]],
+["5090","0.5MP","10s","不明",[194]],
+["5090","0.5MP","15s","不明",[1320]],
+["5090","0.8MP","15s","i2v",[1500]],
+["5090","0.9MP","10s","不明",[302]],
+["5090","0.9MP","15s","不明",[1620]],
+["5090","1MP","5s","不明",[140,300]],
+["5090","1MP","10s","不明",[400]],
+["5090","2MP","5s","不明",[360]],
+["5090","2MP","10s","不明",[1800]],
+["5090",null,"5s","t2v",[80]],
+["5090",null,"8s","i2v",[200]],
+["5090",null,"10s","不明",[1800]],
+["5090",null,"15s","不明",[240,3600]],
+["5090d","0.4MP","5s","不明",[90,140]],
+["5090d","1MP","5s","不明",[120]],
+["6000","2MP","5s","不明",[450]],
+["6000","2MP","15s","不明",[1800,3000]]
+];
+
+/* ---- 解析 ---- */
+const RECS=[];
+ROWS.forEach(r=>{
+  const g=r[0],mp=r[1]===null?null:parseFloat(r[1]),dur=parseInt(r[2]),ref=r[3];
+  if(typeof r[4]==='number') RECS.push({g,mp,dur,ref,t:r[4],n:r[5],agg:true});
+  else r[4].forEach(t=>RECS.push({g,mp,dur,ref,t,n:1,agg:false}));
+});
+const med=a=>{const s=[...a].sort((x,y)=>x-y);const m=Math.floor(s.length/2);return s.length%2?s[m]:(s[m-1]+s[m])/2;};
+const byG={};
+RECS.forEach(x=>{(byG[x.g]=byG[x.g]||[]).push(x);});
+const GPUS=Object.keys(byG).sort((a,b)=>med(byG[a].map(x=>x.t))-med(byG[b].map(x=>x.t)));
+const SUM={};
+GPUS.forEach(g=>{const ts=byG[g].map(x=>x.t);const refs={};
+  byG[g].forEach(x=>refs[x.ref]=(refs[x.ref]||0)+1);
+  SUM[g]={n:byG[g].length,med:Math.round(med(ts)),lo:Math.min(...ts),hi:Math.max(...ts),
+    combos:new Set(byG[g].map(x=>x.mp+'|'+x.dur)).size,refs};});
+
+/* ---- 画图 ---- */
+const RC={'i2v':'#55d8ff','t2v':'#ffcc66','v2v':'#ff759f','不明':'#8fa7c2'};
+const RN={'i2v':'i2v 图参考','t2v':'t2v 文生','v2v':'v2v 视频参考','不明':'未注明'};
+const RN2={'i2v':'i2v','t2v':'t2v','v2v':'v2v','不明':'未注'};
+let refSel='all',durSel='all';
+const W=1700,H=700,ML=82,MR=30,MT=52,MB=158,PW=W-ML-MR,PH=H-MT-MB;
+const LO=Math.log10(30),HI=Math.log10(20000);
+const X=i=>ML+PW*(i+0.5)/GPUS.length;
+const Y=t=>MT+(1-(Math.log10(Math.max(30,Math.min(t,20000)))-LO)/(HI-LO))*PH;
+const TICKS=[30,60,120,300,600,1200,3000,6000,12000,20000];
+const fmt=s=>{if(s<60)return s+'s';if(s<3600)return (s%60===0?s/60:(s/60).toFixed(1))+'min';return (s/3600).toFixed(1)+'h';};
+const RAD=d=>d.mp?Math.min(17,5+d.mp*5.5):5.5;
+const svg=document.getElementById('svg'),tip=document.getElementById('tip');
+let AXIS='';
+function buildAxis(){
+  let g='<line x1="'+ML+'" y1="'+MT+'" x2="'+ML+'" y2="'+(MT+PH)+'" stroke="#355679"/><line x1="'+ML+'" y1="'+(MT+PH)+'" x2="'+(ML+PW)+'" y2="'+(MT+PH)+'" stroke="#355679"/>';
+  TICKS.forEach(t=>{const y=Y(t);g+='<line class="grid" x1="'+ML+'" y1="'+y+'" x2="'+(ML+PW)+'" y2="'+y+'"/><text class="tick-text" x="'+(ML-8)+'" y="'+(y+4)+'" text-anchor="end">'+fmt(t)+'</text>';});
+  GPUS.forEach((gp,i)=>{
+    g+='<text class="gpu-label" transform="translate('+X(i)+','+(MT+PH+10)+') rotate(-42)" text-anchor="end">'+gp+' <small>(n='+SUM[gp].n+')</small></text>';
+    g+='<line x1="'+X(i)+'" y1="'+MT+'" x2="'+X(i)+'" y2="'+(MT+PH)+'" stroke="#16293f"/>';});
+  AXIS=g;
+}
+function pointHTML(d){
+  const cx=X(GPUS.indexOf(d.g)),cy=Y(d.t),c=RC[d.ref];
+  if(d.agg){const k=RAD(d)*1.35;
+    return '<polygon class="cursor" data-i="'+RECS.indexOf(d)+'" points="'+(cx)+','+(cy-k)+' '+(cx+k)+','+(cy)+' '+(cx)+','+(cy+k)+' '+(cx-k)+','+(cy)+'" fill="'+c+'" stroke="#0a1a2c" stroke-width="1.2" opacity=".92"/>';}
+  return '<circle class="cursor" data-i="'+RECS.indexOf(d)+'" cx="'+cx+'" cy="'+cy+'" r="'+RAD(d)+'" fill="'+c+'" fill-opacity=".72" stroke="'+(d.mp?'':'#cfe0f2')+'" stroke-width="'+(d.mp?0:1.2)+'" stroke-dasharray="'+(d.mp?'':'2 2')+'"/>';
+}
+function render(){
+  const vis=RECS.filter(d=>(refSel==='all'||d.ref===refSel)&&(durSel==='all'||d.dur===durSel));
+  svg.innerHTML=AXIS+vis.map(pointHTML).join('');
+  svg.querySelectorAll('[data-i]').forEach(n=>{
+    n.addEventListener('mousemove',e=>{
+      const d=RECS[+n.dataset.i];
+      tip.innerHTML='<b>'+d.g+'</b><br><span class="mp">分辨率 '+(d.mp?d.mp+'MP':'未注明')+'</span> · 视频时长 '+(d.dur?d.dur+'s':'?')+'<br>参考：'+RN[d.ref]+'<br><span class="t">用时 '+fmt(d.t)+'</span>（'+(d.agg?'中位数，共 '+d.n+' 样本':'单条上报')+'）';
+      tip.style.display='block';tip.style.left=(e.clientX+14)+'px';tip.style.top=(e.clientY+12)+'px';
+    });
+    n.addEventListener('mouseleave',()=>tip.style.display='none');
+  });
+}
+function bindFilters(id,setter){
+  document.getElementById(id).addEventListener('click',e=>{
+    const b=e.target.closest('button');if(!b)return;
+    document.querySelectorAll('#'+id+' button').forEach(x=>x.classList.remove('active'));
+    b.classList.add('active');setter(b.dataset.v);render();
+  });
+}
+bindFilters('refF',v=>refSel=v);
+bindFilters('durF',v=>durSel=v);
+
+/* KPI */
+(function(){
+  const fast=GPUS[0],slow=GPUS[GPUS.length-1];
+  const combos=new Set(RECS.map(r=>r.g+'|'+r.mp+'|'+r.dur)).size;
+  const cards=[['纳入样本跑值',RECS.length,'去重后有效记录'],
+    ['显卡/设备数',GPUS.length,'横轴共 '+GPUS.length+' 类'],
+    ['口径数(GPU×MP×时长)',combos,'不同任务组合'],
+    ['中位用时最快',fmt(SUM[fast].med),fast+'（'+SUM[fast].n+' 样本）'],
+    ['中位用时最慢',fmt(SUM[slow].med),slow+'（'+SUM[slow].n+' 样本）']];
+  document.getElementById('kpis').innerHTML=cards.map(c=>'<div class="kpi"><span>'+c[0]+'</span><b>'+c[1]+'</b><span>'+c[2]+'</span></div>').join('');
+})();
+/* 时长按钮 */
+document.getElementById('durBtns').innerHTML=[...new Set(RECS.map(r=>r.dur).filter(Boolean))].sort((a,b)=>a-b).map(d=>'<button data-k="dur" data-v="'+d+'">'+d+'s</button>').join('');
+/* 汇总表 */
+(function(){
+  document.getElementById('tbody').innerHTML=GPUS.map((g,i)=>{
+    const s=SUM[g];
+    const refs=Object.keys(s.refs).map(k=>'<span class="tag" style="color:'+RC[k]+'">'+RN2[k]+'×'+s.refs[k]+'</span>').join('');
+    return '<tr><td>'+(i+1)+'</td><td><b>'+g+'</b></td><td>'+s.n+'</td><td>'+fmt(s.med)+'</td><td>'+fmt(s.lo)+' ~ '+fmt(s.hi)+'</td><td>'+s.combos+'</td><td>'+refs+'</td></tr>';
+  }).join('');
+})();
+buildAxis();render();
+</script>
+</body>
+</html>

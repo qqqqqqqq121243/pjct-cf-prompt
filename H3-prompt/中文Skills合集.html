@@ -1,0 +1,2285 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>H3 Prompt Skills 中文文档合集</title>
+<style>
+:root {
+  --sidebar-w: 300px;
+  --accent1: #4f46e5; --accent2: #7c3aed; --accent3: #db2777;
+  --bg: #f3f4f8; --card: #ffffff; --ink: #1f2430; --muted: #5c6270;
+  --line: #e5e7ef;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: "Segoe UI", "Microsoft YaHei", "PingFang SC", sans-serif;
+  background: var(--bg); color: var(--ink); line-height: 1.75;
+}
+/* 阅读进度条 */
+#progress {
+  position: fixed; top: 0; left: 0; height: 4px; width: 0; z-index: 100;
+  background: linear-gradient(90deg, #6366f1, #a855f7, #db2777);
+  transition: width .1s linear;
+}
+/* 侧边栏 */
+.sidebar {
+  position: fixed; top: 0; left: 0; width: var(--sidebar-w); height: 100vh;
+  background: linear-gradient(180deg, #23263b, #191b2e);
+  color: #e8e9f2; padding: 28px 20px; overflow-y: auto; z-index: 10;
+}
+.sidebar h1 {
+  font-size: 18px; letter-spacing: 1px; margin-bottom: 4px;
+  background: linear-gradient(90deg, #a5b4fc, #f0abfc);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+}
+.sidebar .sub { font-size: 12px; color: #8b90ab; margin-bottom: 22px; }
+.sidebar nav a {
+  display: block; color: #c6c9dc; text-decoration: none; font-size: 14px;
+  padding: 9px 12px; border-radius: 8px; margin-bottom: 4px; transition: all .15s;
+}
+.sidebar nav a:hover { background: rgba(255,255,255,.08); color: #fff; padding-left: 16px; }
+.sidebar nav a .idx {
+  display: inline-block; width: 22px; height: 22px; line-height: 22px;
+  text-align: center; font-size: 12px; font-weight: 700; border-radius: 50%;
+  background: rgba(255,255,255,.12); margin-right: 8px; color: #c4b5fd;
+}
+.sidebar nav a.active { background: rgba(165,180,252,.18); color: #fff; }
+/* 主区 */
+.main { margin-left: var(--sidebar-w); padding: 0 32px 80px; }
+.hero {
+  background: linear-gradient(120deg, #4f46e5, #7c3aed 55%, #db2777);
+  color: #fff; border-radius: 0 0 20px 20px; padding: 46px 40px; margin: 0 -32px 36px;
+}
+.hero h2 { font-size: 30px; letter-spacing: 1px; }
+.hero p { margin-top: 10px; opacity: .92; font-size: 15px; max-width: 860px; }
+.hero .chips { margin-top: 16px; display: flex; flex-wrap: wrap; gap: 8px; }
+.hero .chips span {
+  background: rgba(255,255,255,.18); border: 1px solid rgba(255,255,255,.35);
+  padding: 3px 12px; border-radius: 999px; font-size: 12.5px;
+}
+/* Skill 卡片 */
+.skill-card {
+  background: var(--card); border-radius: 16px; box-shadow: 0 6px 24px rgba(31,36,48,.08);
+  margin-bottom: 40px; overflow: hidden; border: 1px solid var(--line);
+  scroll-margin-top: 24px;
+}
+.skill-head { padding: 26px 34px 20px; color: #fff; }
+.skill-head h2 { font-size: 24px; display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.skill-head h2 .badge {
+  font-size: 13px; font-weight: 700; padding: 3px 12px; border-radius: 999px;
+  background: rgba(255,255,255,.22); letter-spacing: .5px;
+}
+.skill-head .words { font-size: 12.5px; opacity: .85; font-weight: 400; }
+.skill-desc {
+  margin-top: 12px; padding: 14px 18px; border-radius: 10px; font-size: 14px;
+  background: rgba(255,255,255,.14); border-left: 4px solid rgba(255,255,255,.85);
+}
+.skill-meta { margin-top: 10px; font-size: 12.5px; opacity: .92; display: flex; flex-wrap: wrap; gap: 6px 14px; align-items: center; }
+.skill-meta b { opacity: 1; }
+.skill-meta code { background: rgba(255,255,255,.2); color: #fff; padding: 1px 8px; border-radius: 5px; }
+.pill {
+  display: inline-block; background: rgba(255,255,255,.2); border: 1px solid rgba(255,255,255,.4);
+  padding: 1px 10px; border-radius: 999px; font-size: 12px; margin: 1px 2px;
+}
+.skill-body { padding: 26px 34px 34px; }
+/* 正文排版 */
+.skill-body h1 { display: none; }
+.skill-body h2 {
+  font-size: 20px; margin: 30px 0 12px; padding-bottom: 8px;
+  border-bottom: 2px solid var(--line); color: var(--accent1);
+}
+.skill-body h2::after {
+  content: ""; display: block; width: 48px; height: 3px; margin-top: 6px;
+  border-radius: 2px; background: linear-gradient(90deg, var(--accent1), var(--accent3));
+}
+.skill-body h3 { font-size: 16.5px; margin: 22px 0 10px; color: var(--accent2); }
+.skill-body h4 { font-size: 15px; margin: 18px 0 8px; color: var(--accent3); }
+.skill-body p { margin: 8px 0; }
+.skill-body ul, .skill-body ol { margin: 8px 0 8px 26px; }
+.skill-body li { margin: 4px 0; }
+.skill-body li::marker { color: var(--accent2); font-weight: 700; }
+.skill-body strong { color: #b91c48; }
+.skill-body a { color: var(--accent1); }
+/* 表格 */
+.skill-body table {
+  border-collapse: collapse; width: 100%; margin: 14px 0; font-size: 14px;
+  box-shadow: 0 2px 10px rgba(31,36,48,.06); border-radius: 10px;
+}
+.skill-body thead, .skill-body tbody { display: table; width: 100%; table-layout: fixed; }
+.skill-body table-wrap { display: block; overflow-x: auto; }
+.skill-body th {
+  background: linear-gradient(120deg, #4f46e5, #7c3aed); color: #fff;
+  padding: 10px 12px; text-align: left; font-weight: 600; font-size: 13.5px;
+}
+.skill-body td { padding: 9px 12px; border-bottom: 1px solid var(--line); vertical-align: top; }
+.skill-body tr:nth-child(even) td { background: #f7f7fb; }
+.skill-body tr:hover td { background: #eef0ff; }
+/* 代码 */
+.skill-body code {
+  background: #eef0ff; color: #4f46e5; padding: 2px 6px; border-radius: 5px;
+  font-family: "Cascadia Code", Consolas, monospace; font-size: 13px;
+}
+.skill-body pre {
+  background: #1e2233; color: #dbe2ff; padding: 16px 18px; border-radius: 10px;
+  overflow-x: auto; margin: 12px 0; font-size: 13px; line-height: 1.6;
+}
+.skill-body pre code { background: none; color: inherit; padding: 0; }
+/* 引用 = 重点提示 */
+.skill-body blockquote {
+  margin: 14px 0; padding: 12px 16px; border-radius: 8px; font-size: 14px;
+  background: #fff7ed; border-left: 4px solid #f97316;
+}
+.skill-body blockquote p { margin: 4px 0; }
+.footer { text-align: center; color: var(--muted); font-size: 13px; margin-top: 20px; }
+/* 响应式 */
+@media (max-width: 900px) {
+  .sidebar { position: static; width: 100%; height: auto; }
+  .main { margin-left: 0; padding: 0 16px 60px; }
+  .hero { margin: 0 -16px 24px; padding: 30px 22px; }
+  .skill-body table { display: block; overflow-x: auto; }
+}
+</style>
+</head>
+<body>
+<div id="progress"></div>
+<aside class="sidebar">
+  <h1>H3 Skills 合集</h1>
+  <div class="sub">中文版 SKILL 文档 · 共 8 篇</div>
+  <nav>
+    <a href="#skill-1"><span class="idx">01</span>3D动画短片生成器</a>
+<a href="#skill-2"><span class="idx">02</span>品牌宣传短片生成器</a>
+<a href="#skill-3"><span class="idx">03</span>双人游戏开场视频生成器</a>
+<a href="#skill-4"><span class="idx">04</span>手绘实拍视频生成器</a>
+<a href="#skill-5"><span class="idx">05</span>极简产品广告生成器</a>
+<a href="#skill-6"><span class="idx">06</span>音乐美学MV</a>
+<a href="#skill-7"><span class="idx">07</span>纸拼贴讲解动画生成器</a>
+<a href="#skill-8"><span class="idx">08</span>纸艺定格科普视频生成器</a>
+  </nav>
+</aside>
+<main class="main">
+  <div class="hero">
+    <h2>H3 Prompt Skills 中文文档合集</h2>
+    <p>本页面整合了 H3-prompt/skills 目录下全部 8 份中文 Skill 文档，覆盖 3D 动画、品牌宣传、游戏开场、手绘实拍、MV 字幕、产品广告、纸拼贴科普与纸艺定格科普等方向。左侧导航快速跳转，表格、代码与重点提示均已高亮，便于阅读。</p>
+    <div class="chips"><span>3d-animation-short-generator</span><span>brand-promo-video-generator</span><span>co-op-game-intro-generator</span><span>handdrawn-live-video-generator</span><span>minimalist-product-ad-generator</span><span>music-video-subtitle-generator</span><span>paper-collage-explainer-generator</span><span>papercraft-stop-motion-explainer</span></div>
+  </div>
+  <section class="skill-card" id="skill-1">
+
+<div class="skill-head" style="background:linear-gradient(120deg,#6366f1,#a855f7)">
+  <h2><span class="badge">SKILL 01</span>3D动画短片生成器<span class="words">约 15256 字</span></h2>
+  <div class="skill-desc">将一句故事创意转化为完整的风格化3D动画短片制作流程，依次完成项目简报、故事大纲、角色卡、无人物场景卡、标准镜头表、文本分镜或可选铅笔分镜、视频模型选择、单镜头生成、全片拼接、BGM匹配与最终复查。适用于需要角色一致、场景连续、节奏明确和音画配合的剧情动画短片、纪念短片、品牌故事与社交媒体内容。不适用于单张图片、简单修图、真人写实视频或单一独立镜头。</div>
+  <div class="skill-meta"><b>name:</b> <code>3d-animation-short-generator</code></div>
+</div>
+<div class="skill-body">
+<h1>3D动画短片生成器</h1>
+<p>当用户想把一句话创意做成完整的故事优先动画短片流程时使用本 Skill。流程从创意开发到最终剪辑，所有主要产物都必须按生产顺序放到画布上，并在高成本或关键创意节点用选项卡让用户确认。</p>
+<p>核心规则：<strong>先故事、再资产；用户输入内容后立刻用选项卡确认画面尺寸/比例与总时长；产物按顺序上画布；所有需要用户确认的地方必须用选项卡；角色/场景卡后固定顺序为：六列标准镜头信息表（每秒指令+音频+空间锚点链+hook）→ 镜头表自检门 → 一份单一文本分镜文档（每镜一节，对齐半解说短剧分镜字段；用户主动开启可视化模式时再加铅笔图；用户标记需要重点迭代的镜时抽取成独立节点）→ 视频模型选项卡（H3 默认，Seedance 2.0 回退）+ 分辨率选项卡 → 用选定视频模型生成单镜头片段 → 全片拼接与 BGM 合成；最终视频必须清除所有分镜痕迹</strong>。</p>
+<h2>全局视觉风格锁</h2>
+<p>除非用户明确指定其他视觉风格，所有角色卡、场景卡、镜头表格、文本分镜、可选铅笔分镜、单镜头视频片段（无论使用哪个视频模型）、拼接正片和最终合成都必须使用以下视觉风格：</p>
+<ul>
+<li>渲染风格：皮克斯感 3D 卡通渲染，C4D + Octane 渲染器质感，高级动画电影质量。</li>
+<li>角色造型：夸张几何概括与极佳材质质感的平衡。不追求 100% 真人解剖结构，而是使用高概括度几何形体、强剪影和高辨识度设计。</li>
+<li>比例语言：亲和的风格化比例，适合可爱或幼态角色时采用 2.5–3 头身 Q 版比例，大头小身、体块清晰、轮廓易读。</li>
+<li>发丝 / 毛发：整体造型有清晰块面结构，同时边缘保留精细发丝或绒毛细节；在光照下既硬朗有形，又有细腻触感。</li>
+<li>皮肤 / 材质：使用温润次表面散射（SSS）质感，耳朵、脸颊、鼻尖、指尖可有微红透光效果；避免生硬塑料感。</li>
+<li>表演风格：夸张灵动的迪士尼 / 皮克斯式角色动画表演，运用挤压与伸展，强化眉毛、眼角、瞳孔、嘴唇、脸颊形变。</li>
+<li>动态风格：高能量态势、清晰动作线、前倾势能、强预备动作、快速但可读的节奏、弹性身体机制和丰富微表情。</li>
+<li>情绪尺度：在可爱与爆发力之间取得平衡；强情绪可以有戏剧性面部变形，但必须保留角色魅力。</li>
+</ul>
+<p>负向风格约束：不要写实真人摄影、不要扁平二次元、不要塑料玩具皮肤、不要僵硬人体姿势、不要真实解剖僵硬感、不要无生命表情。</p>
+<h2>STEP 0：接收需求与画布规划</h2>
+<p>捕捉：</p>
+<ul>
+<li>一句话创意或粗略故事</li>
+<li>目标产物：只要蓝图、只要资产、六列标准镜头信息表、单文本分镜文档（默认）+ 重点迭代镜抽取的独立节点 + 多宫格铅笔分镜（开启可视化模式时）、单镜头视频片段（视频模型在 Step 7 选定）、拼接正片，还是 BGM 合成最终成片</li>
+<li>用户已说明的预估时长</li>
+<li>用户已说明的画面尺寸 / 比例</li>
+<li>视觉基调：默认温暖风格化 3D 动画</li>
+<li>台词需求：有对白、旁白，还是无台词</li>
+<li>只有用户明确指定台词语言时才锁定语言；不要默认英文台词</li>
+</ul>
+<p>捕捉完用户输入后，在项目简报或任何下一步之前，必须先展示选项卡确认生产规格：</p>
+<p>画面尺寸 / 比例选项卡：</p>
+<ul>
+<li>16:9 横屏（电影短片推荐）</li>
+<li>9:16 竖屏短视频</li>
+<li>1:1 方形</li>
+<li>4:5 社媒竖图</li>
+<li>自定义尺寸 / 比例</li>
+</ul>
+<p>总时长选项卡：</p>
+<ul>
+<li>30–60 秒（推荐）</li>
+<li>15–30 秒</li>
+<li>60–90 秒</li>
+<li>90–180 秒</li>
+<li>自定义时长</li>
+</ul>
+<p>只有用户同时选择画面尺寸/比例和总时长，或明确给出自定义值后，才进入下一步。把已确认的画面尺寸/比例和总时长写入项目简报，并贯穿用于镜头时长、转场连贯性、六列标准镜头信息表、单镜头分镜（默认文本，开可视化模式时含铅笔图）、单镜头视频片段、全片拼接、BGM 匹配和最终合成设置。</p>
+<p>按以下顺序创建或更新画布产物：</p>
+<ol>
+<li>项目简报文本节点</li>
+<li>故事大纲文本节点</li>
+<li>带标注的角色卡图片节点</li>
+<li>无人物的场景卡图片节点</li>
+<li>六列标准镜头信息表节点，每行必须在 <code>镜头描述</code> 内含每秒指令</li>
+<li><strong>单文本分镜文档</strong> — 一个画布文本节点，命名 <code>&lt;title&gt; text storyboards</code>，每镜一节（对齐半解说短剧分镜结构）。用户标记需要重点迭代的镜时，把该节抽取成独立节点，原位置留占位。可视化模式下的铅笔分镜图是独立图片节点。</li>
+<li>单镜头视频片段节点（用 Step 7 选定的视频模型渲染 — H3 默认，Seedance 2.0 回退）</li>
+<li>拼接主视频节点</li>
+<li>匹配的 BGM 音频节点与最终 BGM 合成视频节点</li>
+</ol>
+<p>不要把长篇生产内容只丢在对话里。耐用产物必须以文本、图片、视频或音频节点形式落到画布。</p>
+<h2>STEP 1：项目简报</h2>
+<p>写一份精炼的项目简报到画布文本节点，命名为项目名或 <code>项目简报</code>。</p>
+<p>包含：</p>
+<ul>
+<li>工作标题</li>
+<li>一句话 What-if</li>
+<li>情绪前提</li>
+<li>目标观众感受</li>
+<li>主要交付物计划</li>
+<li>已确认的画面尺寸 / 比例</li>
+<li>已确认的总时长</li>
+<li>台词模式与语言：仅当用户明确要求才锁定具体语言；否则写 <code>language not specified</code>，保持最小化对白或后续再确认</li>
+<li>初始风险</li>
+<li>台词意图（如有）</li>
+</ul>
+<p>然后展示用户选项卡：</p>
+<ul>
+<li>沿用此方向继续（推荐）</li>
+<li>重新生成前提选项</li>
+<li>修订情绪前提</li>
+<li>调整台词方向</li>
+</ul>
+<p>只有用户选择或明确说继续后才进入下一步。</p>
+<h2>STEP 2：故事大纲与守门</h2>
+<p>创建故事大纲并写入画布文本节点，命名为 <code>故事大纲</code> 或 <code>story-outline</code>。</p>
+<p>包含：</p>
+<ul>
+<li>主角 Want / Need / 缺陷</li>
+<li>核心世界规则</li>
+<li>8 拍因果故事骨架</li>
+<li>情绪锚点与回收</li>
+<li>台词节拍（用户要求时）</li>
+<li>红线检查</li>
+</ul>
+<p>守门检查：</p>
+<ul>
+<li>主角是主动的</li>
+<li>危机由主角缺陷放大</li>
+<li>巧合不能解决问题</li>
+<li>结局回收早前情绪锚点</li>
+<li>反派压力不是扁平反派</li>
+<li>台词揭示关系变化而非解释主题</li>
+</ul>
+<p>然后展示用户选项卡：</p>
+<ul>
+<li>批准故事并继续（推荐）</li>
+<li>修订节拍</li>
+<li>修订情绪曲线</li>
+<li>修订台词节拍</li>
+<li>返回前提</li>
+</ul>
+<h2>STEP 3：角色卡</h2>
+<p>生成角色参考卡并把每张图放到画布。推荐顺序：</p>
+<ol>
+<li>主角卡</li>
+<li>对比 / 施压角色卡</li>
+<li>可选配角卡</li>
+</ol>
+<p>每张角色卡在可能时为 16:9 生产参考图。与最终渲染视频不同，角色卡必须包含清晰可读的标注，让下游生成能正确绑定人物与道具：</p>
+<ul>
+<li>角色名标注（英文和/或项目语言）</li>
+<li>角色定位标注：主角、奶奶、小偷、搭档、施压角色等</li>
+<li>主 3/4 视角</li>
+<li>正 / 侧 / 背三视图</li>
+<li>表情</li>
+<li>材质 / 服装 / 道具细节</li>
+<li>重要道具标注：手提包、钱包、滑板、苹果筐、围巾、鞋子、眼镜等</li>
+<li>提示中重复的"身份锁"</li>
+<li>简短视觉 ID 备注：年龄段、身材、发型、服饰色、签名道具、不可改特征</li>
+</ul>
+<p>风格化 3D 动画要保持角色柔和、可读、跨图跨视频一致。</p>
+<p>主要角色卡生成后展示用户选项卡：</p>
+<ul>
+<li>锁定角色设计并继续（推荐）</li>
+<li>重新生成主角卡</li>
+<li>调整具体视觉细节</li>
+<li>增加另一张角色卡</li>
+</ul>
+<p>警告用户：后续修改已锁定的角色设计可能需要重做镜头表、单镜头分镜、单镜头视频片段、拼接正片和最终合成。</p>
+<h2>STEP 4：场景卡</h2>
+<p>在角色卡之后生成场景参考卡并放到画布。场景卡只能展示环境，不出现人物、人群、剪影、手、脸或角色客串。角色动作属于镜头表、单镜头分镜与单镜头视频片段，不属于场景卡。</p>
+<p>包含：</p>
+<ul>
+<li>主环境总览</li>
+<li>关键光态：日景 / 夜景</li>
+<li>情绪子空间</li>
+<li>连续性地标（同场景跨镜头必须保持屏幕位置的固定物体，如厨房中岛、沙发、门框、树、邮筒）</li>
+<li>环境中的重要道具</li>
+</ul>
+<p>然后展示用户选项卡：</p>
+<ul>
+<li>锁定场景设计并继续（推荐）</li>
+<li>重新生成场景卡</li>
+<li>增加另一个场景角度</li>
+<li>调整光位或布局</li>
+</ul>
+<h2>STEP 5：六列标准镜头信息表</h2>
+<p>在角色卡和场景卡锁定后，输出标准化视频提示作为镜头信息表。本步为强制步骤，不可与分镜或视频生成互换。在画布创建表格节点或 markdown 表格，命名为 <code>标准镜头信息表</code> 或 <code>standard-shot-table</code>。</p>
+<p>表格必须严格按以下顺序包含六列：</p>
+<table>
+<thead>
+<tr>
+<th>镜头编号 &amp; 时长</th>
+<th>连续性衔接</th>
+<th>参考锚点（空间+身份）</th>
+<th>Hook 类型</th>
+<th>镜头描述（每秒指令）</th>
+<th>音频与对白轨</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p>列规则：</p>
+<ul>
+<li><strong>镜头编号 &amp; 时长</strong>：镜头号加计划时长，例如 <code>S03 / 6s</code>。</li>
+<li><strong>连续性衔接</strong>：本镜如何自然承接上一镜的结束画面、道具位置、眼神、人物姿态、声桥或情绪状态；以及本镜如何为下一镜开篇铺好钩子。这是跨镜连续性主链。</li>
+<li><strong>参考锚点（空间+身份）</strong>：四个子字段，全部必填。</li>
+<li><code>固定地标</code> — 来自场景卡的确切命名地标，及其相对画面的位置（如 <code>door-frame: 右侧 1/3</code>、<code>kitchen-island: 底部居中</code>）。</li>
+<li><code>人物位置（机位视角）</code> — 镜头中每个角色相对画面的位置（左/中/右、上/中/下、前/中/后景）、朝向、初始姿态。</li>
+<li><code>退场人物状态</code> — 上一镜有但本镜没有的角色，记录其离屏位置和原因（如 <code>Mia — 离屏左侧，最后出现于门框旁手持苹果筐</code>）。</li>
+<li><code>光位基线</code> — 从场景卡继承的主光/补光/轮廓光方向，加本镜调整项（如 <code>主光：温暖顶光，补光：右侧冷反光，调整：窗光背身剪影</code>）。</li>
+<li>加上身份绑定：已批准的角色卡名（精确）和场景卡名（精确）。</li>
+<li><strong>Hook 类型</strong>：从受控词表中挑一个短标签，如 <code>visual-joke</code>、<code>reversal</code>、<code>suspense</code>、<code>tender</code>、<code>chase</code>、<code>reveal</code>、<code>callback</code>、<code>expression-beat</code>。用于整片 hook 分布自检。</li>
+<li><strong>镜头描述</strong>：景别、镜头运动、荷兰角设计、表演风格、音效、负向提示、<strong>视频模型生成备注</strong>（Step 7 选定的模型 — H3 或 Seedance 2.0 — 接收的 prompt 形态略不同；H3 强调包装关键词和文字/UI/动效清晰度，Seedance 2.0 强调电影感镜头和弹性表演），并强制包含 <code>Per-Second Directives</code> 子节。子节必须按秒拆解为 <code>0–1s</code>、<code>1–2s</code>、<code>2–3s</code> 等指令；亚秒关键节拍用 <code>2.0–2.5s</code> 风格标记。每条每秒指令必须覆盖全部 5 个必填要素：
+  1. 动作 / 姿态 / 表情（适用时含 squash-and-stretch、anticipation、overshoot、follow-through）
+  2. 镜头运动（推 / 拉 / 摇 / 倾 / 手持晃动 / 锁定 / 环绕）
+  3. 空间位置（人物在哪、持有什么、地标在画面哪里）
+  4. 音频线索（旁白 / 对白 / 音效 / 呼吸 / 沉默 — 或 <code>silent</code> 表示有意静默）
+  5. 与下一秒或下一镜的交接（这一秒锁定的状态如何递给下一秒）</li>
+<li><strong>音频与对白轨</strong>：本镜完整音频脚本，按时间顺序，独立于每秒指令。字段：</li>
+<li><code>旁白</code> — 旁白文本及时间范围（无旁白则省略）。</li>
+<li><code>对白</code> — 台词、说话人、语气、时间范围。</li>
+<li><code>音效</code> — 关键音效，按时间锚定。</li>
+<li><code>表演备注</code> — 主角离屏旁白时标记 <code>narrator-mouth-closed: true</code>；描述旁白期间表情路径；描述每条对白的具体眼神和身体动作变化。</li>
+</ul>
+<p>表格全局规则：</p>
+<ul>
+<li>每镜必须通过 <code>连续性衔接</code> 列自然继承上一镜画面状态，并为下一镜做铺垫。</li>
+<li>每镜必须含覆盖整个时长的每秒指令，包含动作、姿态、表情、镜头运动、空间位置、音频线索和连续性交接。</li>
+<li>每秒指令必须具体到可直接生成分镜面板；避免"继续移动"这类缺少身体/镜头/道具细节的模糊描述。</li>
+<li>表演必须夸张弹性，符合迪士尼式 squash-and-stretch、anticipation、overshoot、follow-through、overlap、弧线、快速姿态变化和清晰喜剧剪影。</li>
+<li>景别必须在特写 / 大特写与其他必要景别间交替；避免重复景别。</li>
+<li>荷兰角构图必须为追逐、失衡、惊吓或闹剧节拍设计。</li>
+<li>台词语言仅在用户明确要求时使用；否则用最小化非语言特定反应或将台词标记为可选 / 待确认。</li>
+<li>含旁白或对白的镜头，每一秒人物说话时都必须记录嘴部开合；默认离屏旁白为闭，对面对白为开。</li>
+<li>已离屏角色在 <code>退场人物状态</code> 至少记录 1 镜，连续 2 镜明确不在场后再移除。</li>
+</ul>
+<p>然后展示用户选项卡：</p>
+<ul>
+<li>批准表格并进入自检（推荐）</li>
+<li>调整镜头连续性</li>
+<li>让动画更夸张</li>
+<li>调整特写 / 大特写节奏</li>
+<li>调整荷兰角设计</li>
+</ul>
+<h2>STEP 5.5：镜头表自检门（强制）</h2>
+<p>进入铅笔分镜前，必须对已批准的镜头表跑硬性自检。任何一项不通过必须先修订表格再重跑，通过后才向用户申请进入分镜。</p>
+<p>六项必检：</p>
+<ol>
+<li><strong>Hook 密度</strong>：每镜都有 <code>Hook 类型</code>；每连续 3 镜至少 1 镜使用 <code>reveal</code>/<code>reversal</code>/<code>callback</code>；开场镜和收尾镜各带强 hook（<code>visual-joke</code> / <code>reversal</code> / <code>reveal</code> / <code>suspense</code> / <code>tender</code>）。</li>
+<li><strong>单镜时长</strong>：任何镜头不超过 15 秒。节拍需要更长就拆镜。</li>
+<li><strong>单镜角色数</strong>：任何镜头不超过 3 个重要角色（定义为有画面动作或对白的角色）。</li>
+<li><strong>空间锚点继承</strong>：含 2 镜以上的同场景，下一镜的 <code>固定地标</code> 和 <code>光位基线</code> 必须与上一镜一致或含明确连续性备注（如 <code>door-frame 随镜头左环绕由右侧 1/3 移至中央</code>）。</li>
+<li><strong>每秒指令覆盖</strong>：从 <code>0s</code> 到镜尾的每秒都有 <code>Per-Second Directives</code>，每条含 5 个必填要素（动作/姿态/表情、镜头、空间、音频线索、交接）。允许 <code>2.0–2.5s</code> 亚秒节拍但不能留时间空隙。</li>
+<li><strong>跨镜连续性</strong>：逐行读 <code>连续性衔接</code> 列必须形成连续链 — 任何一镜都不能从一个与上一镜结束矛盾的状态起步。任何翻转眼神、人物位置、道具状态或光位的镜头必须明确标记翻转（如 <code>HARD CUT — 时间跳 2h</code>）。</li>
+</ol>
+<p>六项全过后，在画布表格节点顶部加 <code>shot-table self-check: passed</code> 戳，并展示用户选项卡：</p>
+<ul>
+<li>批准自检并绘制分镜（推荐）</li>
+<li>查看自检详情</li>
+<li>修订失败项</li>
+<li>重新跑自检</li>
+</ul>
+<p>任何一项不通过就不进入 Step 6。返回 Step 5，列出失败行，表格修好并重跑自检通过后，才能再次展示分镜批准选项卡。</p>
+<h2>STEP 6：单文本分镜文档（默认）+ 多宫格铅笔分镜图（opt-in）</h2>
+<p>Step 5.5 自检通过后，先展示分镜模式选项卡，再生成任何分镜产物：</p>
+<ul>
+<li><strong>单文本分镜文档（默认，推荐）</strong> — 整个短片一份画布文本节点，所有分镜作为文档内章节。对齐半解说短剧分镜结构：每镜字段（标题/hook/场景/角色/空间锚点/连续性/表演备注）加 Pixar 的每面板四象限内容 + 可选 ASCII 布局。承载完整质控载荷，成本几乎为零。Step 7 选定的视频模型直接读取作为该镜渲染参考。</li>
+<li><strong>单文本分镜文档 + 多宫格铅笔图（可视化模式，opt-in）</strong> — 单文本分镜文档照常作为权威产物，并额外为每镜生成一张多宫格铅笔图供人眼审稿。成本更高，适合用户想在付视频成本前要一次视觉预演，或弹性表演 / 姿态剪影是高风险项想先可视化检查的情况。</li>
+</ul>
+<p>把选中的分镜模式记入项目简报，并在 Step 7、Step 9 和重生成纪律里复用。</p>
+<h3>默认路径：单文本分镜文档</h3>
+<p>为整部短片生成一个画布文本节点，命名 <code>&lt;title&gt; text storyboards</code>（一个文档包含所有分镜）。即使同时生成铅笔图，这份文档仍是 Step 7 的权威渲染参考。结构对齐半解说短剧分镜 —— 每镜是同一文档的章节，用户读跨镜连续性不需要切换节点。</p>
+<p>文档头部块（文档顶部）：</p>
+<ul>
+<li>项目标题、已确认的视频模型、已确认的分辨率、分镜模式、自检状态（如 <code>shot-table self-check: passed at &lt;时间戳&gt;</code>）。</li>
+<li>一段简短的目录，列出每镜的 hook 和章节锚点（如 <code>S01</code>、<code>S02</code> …），便于用户跳转。</li>
+</ul>
+<p>每镜章节结构（每个 <code>##</code> 标题对应一镜，按镜头顺序）。每个章节必须按以下顺序包含这些字段 —— 直接对应半解说短剧的分镜字段：</p>
+<ol>
+<li><strong>镜头标题 &amp; 时长</strong> — 简短可读的本镜标题，加 <code>S&lt;N&gt; / &lt;duration&gt;s</code>（如 <code>S03 / 6s</code>）。</li>
+<li><strong>Hook 类型</strong> — 受控词：<code>setup</code> / <code>visual-joke</code> / <code>reversal</code> / <code>reveal</code> / <code>callback</code> / <code>suspense</code> / <code>tender</code> / <code>chase</code> / <code>expression-beat</code> / <code>climax</code>。用于整片 hook 分布自检。</li>
+<li><strong>场景 &amp; 角色</strong> — 精确场景卡名、精确在屏角色名（绑定到角色卡）。</li>
+<li><strong>空间锚点卡</strong>（强制，四个子字段 —— 直接对齐半解说短剧）：
+   - <code>固定地标</code> — 命名地标及其画面相对位置（如 <code>door-frame: 右侧 1/3</code>、<code>kitchen-island: 底部居中</code>）。
+   - <code>人物位置（机位视角）</code> — 每个在屏角色，画面相对位置、朝向、初始姿态。
+   - <code>退场人物状态</code> — 上一镜有但本镜没有的角色，记录其离屏位置和原因。
+   - <code>光位基线</code> — 从场景卡继承的主光/补光/轮廓光方向，加本镜调整项。</li>
+<li><strong>连续性</strong>（对齐半解说短剧的 handoff 字段）：
+   - <code>承接 S(N-1)</code> — 一两句话交代上一镜结束状态。
+   - <code>交接 S(N+1)</code> — 一句话铺好下一镜开场。</li>
+<li><strong>双绑定</strong> — <code>[char:角色名-01] [char:角色名-02] ... [scene:场景名] [hook: visual-joke]</code> — 精确角色卡名、场景卡名、hook 类型。这些是分镜专用参考标记，视频模型渲染时剥离。</li>
+<li><strong>每面板四象限内容</strong>（按时间顺序；这就是 Pixar 的每秒指令，从表格行原样保留）：
+   - <code>时间码</code> — 如 <code>0–1s</code>。
+   - <code>姿态 + 表情</code> — 具体身体姿态、剪影、关键持握、眼神、表情路径；弹性节拍明确写出 squash / stretch / anticipation / overshoot。这是每面板最大块内容，也是视频模型读取的视觉节拍。
+   - <code>镜头</code> — 景别、镜头运动（推/拉/摇/倾/手持晃动/锁定/环绕）、荷兰角备注。
+   - <code>音频 + 锚点</code> — 音频线索（<code>♪ 旁白: ...</code> / <code>对白: ...</code> / <code>SFX: ...</code> / <code>silent</code>）和空间锚点备注（<code>door-frame: 右侧 1/3</code> / <code>Mia: 中央中景面朝镜头</code>）。
+   - 表演备注（对齐半解说短剧）：旁白秒标 <code>narrator-mouth-closed: true</code>；面对白秒标 <code>mouth-open: speaker</code> 并描述表情路径 / 眼神 / 身体动作变化。</li>
+<li><strong>布局规则</strong>（逐镜适用）：
+   - 3 秒镜 → 3 面板（每秒 1 个）。
+   - 4 秒镜 → 4 面板。
+   - 5 秒镜 → 5 面板。
+   - 6 秒镜 → 6 面板。
+   - 7 秒及以上 → 每秒 1 面板；亚秒关键节拍按需加迷你面板如 <code>2.0–2.5s</code>，仅当该节拍是本镜核心 hook 时。
+   - 面板必须覆盖整镜时长，从首帧到尾帧无时间空隙。</li>
+<li><strong>每面板绑定</strong>：
+   - 绑定表格行中列出的精确角色卡，锁定外观、脸、发型、身材、服装、签名道具、角色身份。使用与表格相同的角色名。
+   - 绑定表格行中列出的精确场景卡，保留环境、道具、地标、运动路径、空间逻辑。</li>
+<li><strong>可选 ASCII 布局块（强烈推荐，零成本）</strong>：<ul>
+<li>每面板附一小段 ASCII 草图（或整镜一张组合草图），让用户秒扫空间布局而不必渲染图。例：
+  <code>[0-1s]  Mia (L, mid)         door-frame (R)
+          ——跪下，双手按苹果筐——
+          cam: low push-in, locked
+          audio: silent | anchor: basket center-bottom
+  [1-2s]  ...</code></li>
+<li>ASCII 块仅供参考；视频模型读取上面结构化的 <code>每面板四象限内容</code>，不读 ASCII。</li>
+</ul>
+</li>
+<li><strong>分镜专用标记</strong>：<ul>
+<li>关键节拍在面板时间码后加 <code>[BEAT]</code>。</li>
+<li>某面板必须交接特定状态到下个面板或下个镜头时，加 <code>[HANDOFF → ...]</code> 短标签，如 <code>[HANDOFF → S04 opening]</code>。</li>
+</ul>
+</li>
+</ol>
+<p>每镜章节模板（任意镜通用，复制粘贴骨架）：</p>
+<pre><code class="language-markdown">## S03 / 6s — 标题：奶奶把苹果筐递给 Mia
+
+- **Hook 类型**：reveal
+- **场景 &amp; 角色**：scene:kitchen | char:Mia, char:Grandma
+- **空间锚点卡**：
+  - 固定地标：door-frame（右侧 1/3）、kitchen-island（底部居中）
+  - 人物位置：Mia（左，中景，面朝镜头）| Grandma（右，前景，面朝 Mia）
+  - 退场人物状态：—
+  - 光位基线：温暖顶光主光 + 右侧冷反光
+- **承接 S02**：奶奶弯下腰从中岛拿起苹果筐
+- **交接 S04**：Mia 接住筐转身，门铃响起
+- **双绑定**：[char:Mia] [char:Grandma] [scene:kitchen] [hook:reveal]
+
+### 每面板四象限内容
+
+#### 0–1s
+- 姿态 + 表情：奶奶弯腰双手持筐；Mia 左侧站姿，眼神好奇
+- 镜头：locked medium shot, eye-level
+- 音频 + 锚点：silent | Mia: L midground | basket: center bottom
+- 表演备注：[BEAT]
+
+#### 1–2s
+- 姿态 + 表情：奶奶手臂伸向 Mia，筐倾斜；Mia 双手前伸准备接
+- 镜头：locked medium shot, eye-level
+- 音频 + 锚点：♪ SFX: basket rustle | anchor: door-frame: 右侧 1/3
+- 表演备注：[HANDOFF → S04 opening]
+
+#### 2–3s
+...
+
+### ASCII 布局（可选）
+[0-1s]  Grandma (R, fg)        door-frame (R, bg)
+        ——lifts basket——        Mia (L, mid)
+        cam: locked | silent
+[1-2s]  ...
+</code></pre>
+<p>所有章节写完后，把文档放到画布，直接进入 Step 7。默认模式下不要调用任何图像生成模型。</p>
+<h3>按镜抽取（重点迭代模式）</h3>
+<p>默认的单文档形态针对阅读和跨镜连续性做了优化。当用户标记某镜需要重点迭代（通常是 climax / 追逐 / 闹剧节拍，每面板内容需要多轮修订），就把该章节从文档中抽取成独立文本节点，让迭代局部化：</p>
+<ul>
+<li><strong>用户信号</strong>：Step 6 之后任何时间用户说"重点改 S05"、"S05 需要返工"、"抽取 S05"、或在分镜批准选项卡选某镜做重点迭代。</li>
+<li><strong>抽取机制</strong>：
+  1. 新建一个画布文本节点，命名 <code>&lt;title&gt; S05 text storyboard (extracted)</code>。
+  2. 把文档中 <code>## S05</code> 章节的完整内容移到新节点。
+  3. 在文档中，把原 <code>## S05</code> 章节替换为一行占位：<code>&gt; S05 — 已抽取到独立节点（见 \</code><title> S05 text storyboard (extracted)`）`。
+  4. Step 7 渲染 S05 时从抽取节点读取；其他镜仍从文档读取。</li>
+<li><strong>回填</strong>：用户满意后，把独立节点折叠回文档（占位换成最新内容），独立节点归档。</li>
+<li><strong>多镜抽取</strong>：每个被抽取的镜各自独立成节点，文档里用占位追踪。</li>
+</ul>
+<p>抽取机制存在是因为独立节点按需使用才高效 —— 但只要迭代压力大就随时可用。</p>
+<h3>Opt-in 路径：多宫格铅笔分镜图（可视化模式）</h3>
+<p>如果用户在分镜模式选项卡选了可视化模式，在单文本分镜文档之外<strong>额外</strong>为每行生成一张多宫格铅笔分镜图。单文本分镜文档仍为权威渲染参考；铅笔图仅供人眼审稿。</p>
+<p>每张铅笔分镜图：</p>
+<ul>
+<li><strong>双绑定标签（右上角，强制写在图上）</strong>：</li>
+<li><code>[char:角色名-01] [char:角色名-02] ...</code> — 本行用到的精确角色卡名。</li>
+<li><code>[scene:场景名]</code> — 精确场景卡名。</li>
+<li><code>[shot: S03] [dur: 6s] [hook: visual-joke]</code> — 镜头号、时长、hook 类型。</li>
+<li>这些标签是分镜专用参考标记，渲染视频时剥离。</li>
+<li><strong>绑定精确角色卡</strong>，锁定人物外观、脸、发型、身材、服装、签名道具、角色身份。</li>
+<li><strong>绑定精确场景卡</strong>，保持环境、道具、地标、运动路径、空间逻辑。</li>
+<li>把行内每秒指令转换为一张分镜面板或一个明确标注的节拍面板：4 秒镜通常 4 面板；6 秒镜通常 6 面板；亚秒关键节拍按需加迷你面板。</li>
+<li><strong>面板物理排版（强制）</strong>：</li>
+<li>3 秒镜 → 1×3 条。</li>
+<li>4 秒镜 → 2×2 网格。</li>
+<li>5 秒镜 → 上排 3 + 下排 2。</li>
+<li>6 秒镜 → 2×3 网格。</li>
+<li>7 秒及以上 → 3 排，面板均衡。</li>
+<li>每面板占据相同画布面积，不允许某面板独占。</li>
+<li><strong>每面板四象限内容（强制）</strong>：</li>
+<li>左上：时间码（如 <code>0–1s</code>）。</li>
+<li>右上：姿态 + 表情草图（最大区域；实际视觉节拍）。</li>
+<li>左下：镜头图标 + 运动箭头（推/拉/摇/环绕/锁定）加荷兰角小备注。</li>
+<li>右下：音频线索（如 <code>♪ 旁白: "我就知道。"</code> / <code>SFX: 门吱呀</code> / <code>silent</code>）和锚点备注（如 <code>door-frame: 右侧 1/3</code>）。</li>
+<li>面板按阅读顺序排布，多个不同镜头不合并到同一图。</li>
+<li>每面板标记时间码如 <code>0–1s</code>、<code>1–2s</code>，并展示对应姿态、表情、动作、镜头运动、道具位置、音效线索和连续性交接。</li>
+<li>输出纯黑白铅笔线稿：不上色、不带最终渲染光、不带精致 3D 渲染。</li>
+<li>在分镜图上标镜头号，必要时每面板加镜头运动图标 / 标记。</li>
+<li>必要时包含分镜专用标记：铅笔结构线、动作箭头、镜头路径图标、时间标记和小注。</li>
+<li>草稿只作为视频渲染参考资产，不是终稿美术。</li>
+</ul>
+<h3>分镜批准（两种模式通用）</h3>
+<p>所有文本分镜章节（和可视化模式下的铅笔图）产出后，按镜头顺序放到画布，归组为：
+- <code>&lt;title&gt; text storyboards</code>（默认模式，单文档），或
+- <code>&lt;title&gt; text storyboards + multi-panel pencil storyboards</code>（可视化模式，文本文档和铅笔图分两类各自归组，因为铅笔图含双绑定标签、ASCII 标签和镜头号，文本文档没有这些）。</p>
+<p>展示用户选项卡：</p>
+<ul>
+<li>批准分镜并渲染镜头视频（推荐）</li>
+<li>抽取 / 回填某镜（在文档和独立节点之间移动章节）</li>
+<li>重画选定的铅笔分镜（仅可视化模式）</li>
+<li>修复角色一致性</li>
+<li>修复场景逻辑</li>
+<li>修复镜头标记</li>
+<li>修复音频/锚点标记</li>
+</ul>
+<h3>分镜生成失败回退（仅可视化模式）</h3>
+<p>如果铅笔分镜图无法按要求质量产出（布局塌陷、标签糊掉、面板合并、角色走样），在向用户求助前按以下升级路径处理：</p>
+<ol>
+<li><strong>第一次重试</strong>：用更紧的提示重画同一镜，明确写上四象限布局、<code>[char:…] [scene:…] [shot:…]</code> 标签和每面板内容规则。</li>
+<li><strong>第二次重试</strong>：去掉右下音频/锚点象限文字（保留为带小 <code>♪</code> 标记的空白格），减少文字负载；通常能修掉标签糊掉但不影响视觉节拍。</li>
+<li><strong>第三次重试</strong>：面板数减 1（例如 6 面板→5 面板，合并两秒动作最弱的秒），镜头图标简化为单箭头。</li>
+<li><strong>同一镜连续 3 次失败后</strong>：暂停并用选项卡问用户：
+   - 切换为色块分镜（灰色方块占位姿态，不画铅笔线），仅限失败这一镜。
+   - 放弃该镜的铅笔图，仅靠单文本分镜文档推进该行。
+   - 在 Step 5 把该镜拆为两段更短的镜头并重跑 Step 5.5。
+   - 手动提供参考图代替生成。</li>
+</ol>
+<p>默认文本模式没有这套回退 —— 文本分镜失败只发生在模型无法产出连贯结构化文本时，遇到就直接回到 Step 5 修订该行表格。</p>
+<h2>STEP 7：视频模型选项卡 + 单镜头视频片段</h2>
+<h3>视频模型选项卡（任何片段渲染前的强制门）</h3>
+<p>任何片段渲染前必须先展示视频模型选项卡。选择写入项目简报，本项目所有片段沿用，除非用户后续修改。</p>
+<p>视频模型选项卡：</p>
+<ul>
+<li><strong>H3（推荐默认）</strong> — 强项是视觉包装、动效图形、文字/UI 清晰度、多模态上下文理解、性价比（2K 约同类旗舰 1/3 价格，768P 约 1/2）。原生双声道音视频，单片段最长 15s @ 2K。最适合：设计语言强的皮克斯 3D 动画短片、文字 / 字幕 / UI 元素、动效转场、对话驱动且音频就是交付物一部分的镜头。</li>
+<li><strong>Seedance 2.0（高强度动画表演的回退）</strong> — 强项是电影感镜头、复杂运镜、皮克斯弹性表演、动作张力。适合追逐、闹剧节拍、以动画本身为卖点的 climax 镜头。</li>
+<li><strong>逐镜混合（高级）</strong> — 在镜头表某行的 <code>镜头描述</code> 列加 <code>video_model: H3</code> 或 <code>video_model: Seedance2</code> 字段，本项目同时混用。未标记的行默认走 H3。</li>
+</ul>
+<h3>分辨率选项卡（视频模型锁定后）</h3>
+<p>视频模型确定后再展示分辨率选项卡：</p>
+<ul>
+<li>768P（H3 首推，性价比高）</li>
+<li>2K（H3 默认质量，成本更高，画质更清）</li>
+<li>1080p（Seedance 2.0 推荐）</li>
+<li>720p（Seedance 2.0 草稿，最低成本）</li>
+<li>匹配项目 / 自定义分辨率</li>
+</ul>
+<p>首条片段渲染前用户必须先确认分辨率。后续用户可针对单条 hero 镜头临时改分辨率。</p>
+<h3>单镜头片段渲染</h3>
+<p>每行批准后调用选定的视频模型生成对应独立视频片段。每条片段必须严格使用单文本分镜文档中匹配的章节（若该章节已抽取成独立节点则从独立节点取）、角色卡和场景卡。</p>
+<p>各模型通用规则：</p>
+<ul>
+<li>单文本分镜文档是权威的逐镜参考：叙事、构图、镜头运动、动作编排、每秒时间、镜头号都从这里取。已抽取的镜从独立节点取。若同时存在铅笔分镜图，仅用于人眼侧的姿态/剪影预检；不得让铅笔图覆盖文本分镜。</li>
+<li>角色卡为权威身份源。</li>
+<li>场景卡为权威环境源。</li>
+<li><strong>剥离所有分镜双绑定标签</strong>（<code>[char:…]</code>、<code>[scene:…]</code>、<code>[shot:…]</code>、<code>[dur:…]</code>、<code>[hook:…]</code>）再渲染视频 — 这些是分镜专用参考标记，不能出现在最终片段里。铅笔分镜图还自带镜头号、镜头图标、箭头和备注，渲染时也要一并移除。</li>
+<li>渲染片段只能包含干净的皮克斯感全彩 3D 动画内容。</li>
+<li>不要分镜线稿、不要手绘草图质感、不要标签、不要字幕（除非要求）、不要水印。</li>
+<li>保持已批准的画面尺寸 / 比例和已批准的分辨率。</li>
+</ul>
+<h3>模型相关 prompt 形态</h3>
+<p>单文本分镜文档（已抽取的镜从独立节点取）同时喂两个模型，但包在分镜外的 prompt 前缀不同：</p>
+<ul>
+<li><strong>H3 prompt 前缀</strong>（默认）：强调包装关键词、设计语言、动效清晰度、文字/UI 元素（如果相关）、双声道音频意图。H3 强在指令遵循，每秒指令可以几乎原文送入。追加：<code>Pixar-inspired 3D cartoon rendering, C4D + Octane look, stylized Q-version proportions, warm SSS skin, designed-with-detail hair, strong character design language, clean motion, on-brand color palette</code>。</li>
+<li><strong>Seedance 2.0 prompt 前缀</strong>（表演回退）：强调电影感镜头语言、弹性 squash-and-stretch、anticipation、follow-through、光位戏剧性、镜头选择。追加：<code>cinematic Pixar-quality 3D animation, elastic squash-and-stretch performance, Disney-style anticipation and overshoot, dramatic key lighting, lens-specific depth of field</code>。</li>
+</ul>
+<p>用户选了逐镜混合时，按该行 <code>video_model</code> 字段匹配的前缀。</p>
+<h3>各模型失败回退</h3>
+<p>H3 失败回退阶梯：</p>
+<ol>
+<li>第一次重试：用直接引用表格中 <code>参考锚点</code> 块的强化 H3 prompt 重渲染。</li>
+<li>第二次重试：把该镜缩到 ≤6s，把砍掉的秒拆到 Step 5 的新相邻行，重跑 Step 5.5 自检再重渲。</li>
+<li>第三次重试：把失败这一镜切到 Seedance 2.0（这正是混合模式存在的意义 — 表演回退是一键切换，不是重构流程）。</li>
+<li>同一镜连续 3 次失败：暂停并用选项卡问用户：
+   - 单独把这一镜切到 Seedance 2.0。
+   - 放宽要求（去掉一个道具、简化动作、降低 hook 强度）。
+   - 跳过该镜，下游加 <code>placeholder: missing clip</code> 标记。
+   - 手动提供参考视频代替生成。</li>
+</ol>
+<p>Seedance 2.0 失败回退阶梯（用户全局选了 Seedance 时，或 H3 已失败 3 次后）：</p>
+<ol>
+<li>第一次重试：直接引用 <code>参考锚点</code> 块的强化 prompt 重渲染。</li>
+<li>第二次重试：去掉参考图，纯文本生成。</li>
+<li>第三次重试：缩到 ≤6s，砍掉的秒拆到新行。</li>
+<li>同一镜连续 3 次失败：问用户 — 切到 H3、宽松要求、跳过、手动参考视频。</li>
+</ol>
+<h3>所有片段渲染完成后</h3>
+<p>按镜头顺序放到画布，归组为 <code>&lt;title&gt; shot clips</code>（不再硬编码单一模型名，因为项目可能混用 H3 和 Seedance 2.0），展示用户选项卡：</p>
+<ul>
+<li>批准片段并合成全片（推荐）</li>
+<li>重渲染选定片段（可指定用同一模型或切换）</li>
+<li>修复角色不一致</li>
+<li>修复场景不一致</li>
+<li>加强分镜清理</li>
+<li>修复跨片段空间锚点漂移</li>
+</ul>
+<p>如果渲染片段与已批准的 <code>参考锚点</code> 漂移（门框落到错边、人物从错边离屏、光位翻转），用直接引用 <code>参考锚点</code> 块的强化提示重渲染；持续漂移时按混合模式切到另一模型；不要在拼接时静默混合修正版和未修正版。</p>
+<h2>STEP 8：全片拼接、BGM 匹配与最终输出</h2>
+<p>所有单镜头片段批准后，按表格顺序拼接成完整主视频。然后生成一条连续 BGM 匹配故事氛围，嵌入拼接视频。</p>
+<p>拼接与 BGM 规则：</p>
+<ul>
+<li>严格按已批准表格的镜头顺序。</li>
+<li>BGM 匹配拼接视频的实际节奏、情绪弧、喜剧节拍、追逐节奏和结尾氛围。</li>
+<li>在对白、非语言反应和重要音效下 duck BGM。</li>
+<li>保留原片段音频和音效（除非用户要求替换）。</li>
+<li>不要逐镜生成 BGM。</li>
+<li>不要加字幕或文字（除非用户明确要求）。</li>
+<li>最终视频必须保持干净动画视觉、无任何分镜痕迹，包括没有 <code>[char:…] [scene:…] [shot:…]</code> 双绑定标签。</li>
+</ul>
+<p>然后展示用户选项卡：</p>
+<ul>
+<li>批准最终成片（推荐）</li>
+<li>重新生成 BGM</li>
+<li>调整 BGM 混音</li>
+<li>重渲染选定片段</li>
+</ul>
+<h2>STEP 9：最终复盘</h2>
+<p>用户要求诊断或存在明显风险时，生成一段简短复盘文本节点。</p>
+<p>检查：</p>
+<ul>
+<li>角色一致性</li>
+<li>场景连续性（对照 <code>参考锚点</code> 列验证：每个地标是否落在表格说的位置）</li>
+<li>情绪锚点回收</li>
+<li>镜头意图清晰度</li>
+<li>对白可懂度</li>
+<li>音效/动效同步（对照 <code>音频与对白轨</code> 列）</li>
+<li>BGM 平衡</li>
+<li>最终视频无分镜痕迹：没有面板边框、铅笔线、箭头、标签、手写备注、时间标记、姿态残影、分镜文字，<strong>也没有双绑定标签</strong>（<code>[char:…]</code>、<code>[scene:…]</code>、<code>[shot:…]</code>、<code>[dur:…]</code>、<code>[hook:…]</code>）</li>
+<li>缺失或薄弱片段</li>
+<li>任何可能需要重做的资产</li>
+</ul>
+<h2>画布排序与归组纪律</h2>
+<p>每生成一个耐用产物，立刻按 STEP 0 顺序写到画布。生成工具自动上画布的不重复。</p>
+<p>每个生产环节都归组：</p>
+<ul>
+<li>项目简报与故事大纲在都有时归组为 <code>&lt;title&gt; story planning</code>。</li>
+<li>角色卡归组为 <code>&lt;title&gt; character cards</code>。</li>
+<li>场景卡归组为 <code>&lt;title&gt; scene cards</code>。</li>
+<li>标准镜头表归组为 <code>&lt;title&gt; shot table</code>。</li>
+<li>单文本分镜文档归组为 <code>&lt;title&gt; text storyboards</code>（默认模式，单文档）。抽取的独立文本分镜节点和铅笔分镜（可视化模式）各自分组：<code>&lt;title&gt; extracted text storyboards</code> 和 <code>&lt;title&gt; multi-panel pencil storyboards</code>。所有分镜组与渲染片段组分开，因为分镜含双绑定标签、镜头号、镜头图标、箭头和铅笔线。</li>
+<li>单镜头视频片段归组为 <code>&lt;title&gt; shot clips</code>（标签不再硬编码单一模型名，因为项目可能混用 H3 和 Seedance 2.0）。</li>
+<li>拼接主视频、匹配 BGM 和最终合成视频在都有时归组为 <code>&lt;title&gt; final delivery</code>。</li>
+</ul>
+<p>一轮生成产出 2 个或更多产物时，立刻归组并起一个清晰标题。渲染器位置未刷新导致归组失败时，请用户点击/拖动任一画布节点一次，再重试归组，必要时再进入下一个高成本环节。</p>
+<h2>用户选项卡纪律</h2>
+<p>每个需要用户确认的地方都用选项卡。不要用纯对话问题或散文代替。强制选项卡门：</p>
+<ul>
+<li>输入捕获后，下一步之前：选画面尺寸 / 比例</li>
+<li>输入捕获后，下一步之前：选总时长</li>
+<li>项目简报后</li>
+<li>故事大纲后</li>
+<li>角色卡后</li>
+<li>场景卡后</li>
+<li>标准镜头表后（门 1：批准表格进入自检）</li>
+<li>镜头表自检通过后（门 2：批准自检，然后立即选分镜模式：仅文本 / 文本+铅笔图）</li>
+<li>单镜头分镜后（默认单文本分镜文档，可含抽取的独立节点；可视化模式时含铅笔图）</li>
+<li>单镜头视频片段渲染前：选视频模型（H3 默认，Seedance 2.0 回退，逐镜混合）</li>
+<li>单镜头视频片段渲染前：选视频分辨率</li>
+<li>单镜头视频片段后</li>
+<li>全片拼接、BGM 匹配和最终合成后</li>
+</ul>
+<p>默认推荐项放最前。始终允许用户自定义输入。用户说"继续"时按选了推荐项处理。</p>
+<h2>重生成与最新资产纪律</h2>
+<p>用户重做或修订任何产物时，下游步骤必须用最新批准的产物，不能用旧的。</p>
+<p>规则：</p>
+<ul>
+<li>角色卡重做后，未来的镜头表、单文本分镜文档（含抽取的独立节点；可视化模式下还含铅笔分镜）、单镜头视频片段、拼接视频、最终合成必须按精确角色名引用新的带标注角色卡。</li>
+<li>场景卡重做后，未来的镜头表、单文本分镜文档（含抽取的独立节点；可视化模式下还含铅笔分镜）、单镜头视频片段、拼接视频、最终合成必须按精确场景名引用新场景卡。</li>
+<li>镜头表修订后，未来的分镜（文档+抽取节点）、单镜头视频片段、拼接必须用新表。Step 5.5 的自检必须在分镜恢复前重跑。</li>
+<li>单文本分镜文档中某章节修订后，对应单镜头视频片段必须用新章节内容。若该章节已抽取成独立节点，则独立节点为权威。</li>
+<li>抽取的独立文本分镜节点修订后，用户满意时回填到文档（占位换成最新内容），独立节点归档。</li>
+<li>可视化模式下铅笔分镜重画后，对应视频片段仍以单文本分镜文档（或抽取的独立节点）为准；铅笔图仅供人眼参考，可独立重画而无需强制重渲视频。</li>
+<li>单镜头视频片段重渲染后，拼接、BGM 匹配和最终合成必须用新片段。片段原用 H3 渲染，用户想切到 Seedance 2.0 重渲（或反向）按模型切换处理 — 在项目简报记入新模型，重检 per-shot 规则。</li>
+<li>BGM 重新生成后，最终合成必须用新 BGM。</li>
+</ul>
+<p>任何重做后：</p>
+<ol>
+<li>在下一条文本输出或回复中标记重做产物为当前批准版本。</li>
+<li>在所有后续提示中优先用新文件路径 / 节点。</li>
+<li>画布上同时存在多版本时，按文件名 / 节点名指明当前选用版本再继续。</li>
+<li>不要在最终拼接中静默混合新旧资产。</li>
+</ol>
+<h2>边界</h2>
+<p>单张图、简单修图、单段镜头动画、logo 设计、纯提示咨询不用本 Skill。用户只要提示时，用视频提示工作流。用户只要角色卡时，用角色拆解工作流。</p>
+</div>
+</section>
+<section class="skill-card" id="skill-2">
+
+<div class="skill-head" style="background:linear-gradient(120deg,#0891b2,#4f46e5)">
+  <h2><span class="badge">SKILL 02</span>品牌宣传短片生成器<span class="words">约 3681 字</span></h2>
+  <div class="skill-desc">面向需要为品牌、产品、网站、App、小店或个人项目制作宣传内容的运营与创作者。用户需提供 LOGO、产品图、界面截图、官网链接或其他可核验素材，并确认时长、画幅、受众和推广重点。Skill 会整理品牌事实与素材来源，选择叙事方向，规划精确节拍和镜头，生成所需图像、视频、旁白或音乐，并完成合成与交付前检查。最终输出一条突出产品功能、使用场景和行动号召的品牌宣传短片。适用于新品发布、官网展示和社交媒体推广，不适用于缺少授权素材时仿造真实品牌标识、虚构产品功能或制作长篇剧情影片。</div>
+  <div class="skill-meta"><b>name:</b> <code>brand-promo-video-generator</code><span><b>可用工具:</b></span><span class="pill">webfetch</span><span class="pill">hub_image_search</span><span class="pill">hub_analyse_media</span><span class="pill">hub_canvas_get_node</span><span class="pill">task</span><span class="pill">hub_audio_meta</span><span class="pill">hub_canvas_group_recent_outputs</span></div>
+</div>
+<div class="skill-body">
+<h1>品牌宣传短片生成器</h1>
+<p>为品牌、产品、网站、App、小店或个人项目制作一条好看、清晰、能直接展示的宣传短片。用户可以提供 LOGO、产品图、截图、官网链接，也可以只给一个想法；Skill 会把这些素材整理成品牌短片。</p>
+<p>此 Hub 适配版已移除第三方 Vibe Motion / Remotion 项目初始化与 npm 校验依赖，改为 Hub 原生编排：来源研究、资产核验、故事规划、图像/视频生成、可选语音或音乐，以及后期合成。正常执行时不要初始化外部项目。</p>
+<h2>步骤 1：上传素材并确认简报</h2>
+<p>在任何故事规划或生成之前，必须先进行用户问询。请用户上传或提供链接，用于核验以下元素：</p>
+<ul>
+<li>LOGO 文件或官方 LOGO 来源页面</li>
+<li>字体文件、字体名称、字体规范，或能体现品牌字体的官方网站页面</li>
+<li>品牌颜色、色彩系统、风格指南，或能清楚体现官方色彩的页面</li>
+<li>产品图片、界面截图、包装、渲染图、视频素材或其他品牌图片</li>
+<li>产品信息：官方产品名称、功能列表、发布重点、宣传主张、行动号召、免责声明和目标受众</li>
+<li>公司/产品官网或官方资料包</li>
+</ul>
+<p>默认把用户上传的素材视为可用于前期方案和概念制作，不要在第一轮问询中反复单独追问“是否有授权”。只有出现明确风险信号时才询问，例如可见第三方水印、明显抓取的电商/图库图、用户表述互相矛盾、涉及法律/医疗/金融合规主张，或用户明确要求商用发布。来源清单中将素材记录为“用户提供”，并在来源摘要里提示必要的权利注意事项，而不是阻塞流程。</p>
+<p>在同一次开场问询中，让用户选择：</p>
+<ul>
+<li>目标时长，通常为 15-30 秒；如果用户想要快速发布片，推荐 15 秒</li>
+<li>画幅比例；提供 16:9、9:16、1:1、4:3、3:4 或匹配用户参考图等常见选项</li>
+</ul>
+<p>如果活动重点、投放渠道、旁白语言、画面文案语言和画面文案需求尚不清楚，也在此阶段一并确认。用户未提供可用素材，且未明确说明哪些元素不可用之前，不要进入创意方向阶段。</p>
+<p>宣传片内容语言规则：旁白和画面文案语言应根据品牌素材、目标受众和投放平台判断，不要机械跟随聊天语言。如果品牌素材和可见来源文案主要是英文或全球企业英文，默认旁白和画面文案使用英文，除非用户明确要求中文本地化。即使用户用中文聊天或说“我是新用户测试”，聊天回复仍用中文，但视频实际文案应使用最适合该品牌传播的语言。</p>
+<p>如果 LOGO、产品界面、人物、吉祥物、包装、字体、色彩系统或其他带身份识别的资产无法认证，停止并向用户索要授权原件，不要生成看起来相似的替代品。</p>
+<h2>步骤 2：建立品牌事实表</h2>
+<p>研究或检查最可靠的来源，并在创意制作前总结品牌事实表：</p>
+<ol>
+<li>用户提供的原始导出文件</li>
+<li>官方网站、静态资源包、新闻中心、品牌门户、媒体资料包、新闻资料包或官方仓库</li>
+<li>公司控制的官方媒体库</li>
+<li>授权图库或授权合作方资料包</li>
+</ol>
+<p>提取：</p>
+<ul>
+<li>精确 LOGO 版本、安全空间和使用限制</li>
+<li>官方字体或可见的字体行为</li>
+<li>主色、辅助色和动态色彩</li>
+<li>品牌语气、原则、视觉母题和交互语言</li>
+<li>当前产品名称、功能、场景、指标、口号、行动号召和免责声明</li>
+<li>官方摄影、渲染图、界面截图、视频素材、新闻素材和媒体包内容</li>
+</ul>
+<p>不要使用 LOGO 聚合站、搜索缩略图、粉丝重绘、Pinterest 转发或 AI 生成替代品作为带身份识别的来源。程序化图形只可作为非写实动效层：遮罩、渐变、色块、网格、辉光、粒子、轨迹、字体、已验证数据图表和转场几何。</p>
+<h2>步骤 3：创建来源清单</h2>
+<p>为每个带身份识别的资产记录一份简洁来源清单，可作为文字节点或表格交付给用户。清单应包含：</p>
+<ul>
+<li>稳定资产 ID 与角色</li>
+<li>本地路径或画布节点引用</li>
+<li>精确来源 URL，或用户提供来源说明</li>
+<li>来源类型，例如官网、媒体包、用户原始素材或授权图库</li>
+<li>用于比对的验证目标</li>
+<li>权利或发布说明</li>
+<li>真实性状态：已验证、用户提供、已授权或阻塞</li>
+</ul>
+<p>来源清单本身不等于发布授权。授权不明确时，将视频标注为非官方概念，并告知用户商业发布需要许可。</p>
+<h2>步骤 4：选择故事脊柱</h2>
+<p>如果用户尚未选定方向，给出 2-3 个简短创意方向，推荐一个，并在确认后继续。按产品类型选择叙事脊柱：</p>
+<ul>
+<li>AI / SaaS：用户意图 -&gt; 思考或规划 -&gt; 能力 -&gt; 执行 -&gt; 有用输出 -&gt; 证明 -&gt; LOGO</li>
+<li>实体产品：英雄展示 -&gt; 交互 -&gt; 功能特写 -&gt; 使用场景 -&gt; 结果 -&gt; LOGO</li>
+<li>服务 / 公司：背景 -&gt; 流程 -&gt; 证据 -&gt; 成果 -&gt; 承诺 -&gt; LOGO</li>
+<li>图像主导品牌：真实影像 -&gt; 视觉母题 -&gt; 利益点 -&gt; 情绪回报 -&gt; LOGO</li>
+</ul>
+<p>故事必须产品专属。展示真实功能、交互、场景、输出和证明，不要用抽象特效掩盖薄弱产品叙事。</p>
+<h2>步骤 5：规划精确节拍</h2>
+<p>生成前先规划带帧意识的时间线。除非输出流程另有要求，默认用 30fps 作为规划单位。</p>
+<p>15 秒影片建议 5-8 个主要节拍；30 秒影片建议 8-12 个主要节拍。每个节拍应定义：</p>
+<ul>
+<li>开始与结束时间或帧范围</li>
+<li>视觉主导元素和真实资产 ID</li>
+<li>主要动作</li>
+<li>镜头中展示的产品或品牌证明</li>
+<li>文案与可读停留</li>
+<li>色彩状态</li>
+<li>入场与出场转场</li>
+<li>动作意图：铺垫、预备、承诺、冲击、制动、稳定</li>
+</ul>
+<p>一个实用的 15 秒结构是：品牌钩子、用户意图或场景建立、产品机制、能力或应用场景、输出或证明、产品回报、最终 LOGO 与行动号召。当前一个动作能自然带出下一个镜头时，可使用 6-12 帧重叠。</p>
+<h2>步骤 6：导演动效语言</h2>
+<p>用可控方式建立强度：</p>
+<ul>
+<li>让产品动作、光标路径、界面流、光线、滚动内容、物体边缘或匹配几何驱动转场</li>
+<li>使用 2-5 个有意义的色彩状态</li>
+<li>每个节拍保留一个主要动作；次级层稍作延迟</li>
+<li>设置 2-3 个高能峰值和较安静的制动时刻</li>
+<li>保持剪影、文案和 LOGO 安全空间清晰可读</li>
+<li>避免虚假 HUD、随意玻璃卡片、装饰性文字墙、未经验证的指标，以及全片同一种缓动</li>
+</ul>
+<p>AI 产品至少包含一条可读链路，例如：提示词 -&gt; 规划 -&gt; 并行能力 -&gt; 生成结果 -&gt; 证明。实体或服务产品则展示从用户动作到具体成果的因果关系。</p>
+<h2>步骤 7：生成前硬确认</h2>
+<p>在生成任何视频、图片序列、语音、音乐或最终剪辑之前，必须停下，并先向用户展示完整前期方案：</p>
+<ul>
+<li>来源清单或来源摘要</li>
+<li>品牌事实表</li>
+<li>已选创意方向</li>
+<li>精确节拍 / 分镜计划</li>
+<li>画面文案、CTA、旁白和声音方案</li>
+<li>已知的真实性、授权或占位说明</li>
+</ul>
+<p>生成前保持简洁确认。用户在看过前期方案后，如果明确表达认可或推进意图，例如“确认”“生成”“可以”“继续”“下一步”“go ahead”“continue”“next”等，应视为允许生成，除非同一句话同时要求修改。若用户要求跳过流程，仍需先给出简版来源摘要、品牌事实表和分镜节拍；随后用户表达同意推进即可生成。只有当用户回复含糊或提出修改时，才列出修改分镜、修改文案、修改声音或暂停等选项。</p>
+<h2>步骤 8：生产 Hub 资产</h2>
+<p>只有生成前硬确认通过后，才可以使用 Hub 原生生成与剪辑。每次派发都应自包含：所选模型、画面比例、真实参考路径和用户原始需求。</p>
+<p>典型制作流程：</p>
+<ol>
+<li>生成或准备已验证的静帧、界面底板、产品主视觉帧或适合动效的视频首帧。</li>
+<li>基于这些画面或精确文字描述生成视频片段，并保持相同比例与品牌资产。</li>
+<li>品牌短片的默认声音策略：当用户要求 BGM、音乐、配乐、氛围声，或只说要一条完整宣传片而没有要求独立音轨时，优先使用所选视频模型的原生音频，不要默认拆成“无声视频 + 单独音乐”。默认 MiniMax H3 路线应开启原生音频（<code>generate_audio=true</code>），并在视频提示词中写入品牌安全的纯音乐 / UI 音效设计。</li>
+<li>只有当用户明确需要可控旁白、口播、对白、可单独替换的 BGM、独立于视频的精确音乐时长、后期混音，或所选视频模型无法生成合适音频时，才单独生成语音或音乐。不要让视频原生音频和独立音频重复生成同一条声轨。</li>
+<li>在剪辑阶段合成片段、用户明确要求的独立音频和最终品牌锁定画面。只有用户明确要求字幕时才添加字幕。</li>
+</ol>
+<p>不得重绘或近似 LOGO、字标、产品界面、包装、吉祥物、人物或品牌场景。生成素材只用于抽象动效、氛围、转场几何，或明确为概念化且不冒充官方产品证据的场景。</p>
+<h2>步骤 9：交付前验证</h2>
+<p>最终回复前检查：</p>
+<ul>
+<li>LOGO 和带身份识别的资产来自已验证或用户授权的来源</li>
+<li>产品名称、功能表述、主张、指标、口号和行动号召与官方来源一致，或被明确标注为概念文案</li>
+<li>视频时长、比例和语言符合简报</li>
+<li>文案可读且不过度拥挤</li>
+<li>最终 LOGO 未被拉伸、裁切或重建</li>
+<li>动效有清晰视觉主导，不遮挡产品</li>
+<li>输出已在画布上，多资产输出已编组</li>
+</ul>
+<p>如果真实性检查失败，用官方或用户授权来源替换可疑资产，或停止并向用户索取资产。绝不优化仿制品。</p>
+<h2>步骤 10：交付</h2>
+<p>提供：</p>
+<ul>
+<li>最终视频路径或画布输出</li>
+<li>时长、比例和语言</li>
+<li>简短创意总结</li>
+<li>来源清单或来源摘要</li>
+<li>必要的权利/免责声明</li>
+<li>下一轮可改进的具体建议，例如节奏、主张清晰度、行动号召、音频或平台裁切</li>
+</ul>
+<h2>失败恢复</h2>
+<ul>
+<li>LOGO 错误或近似：移除它，定位当前官方文件或向用户索要原件，再重新生成或剪辑。</li>
+<li>产品/界面看起来虚假：替换为官方、用户提供或授权素材，不要美化仿制品。</li>
+<li>好看但通用：加入完整产品交互、已验证主张或真实输出。</li>
+<li>快但混乱：减少同时动作，指定视觉主导，并保持跨镜头匹配运动。</li>
+<li>顺滑但太慢：缩短停留，重叠转场，只在关键信息处制动。</li>
+<li>资产不可用：索要授权原件，绝不猜测。</li>
+</ul>
+</div>
+</section>
+<section class="skill-card" id="skill-3">
+
+<div class="skill-head" style="background:linear-gradient(120deg,#0d9488,#6366f1)">
+  <h2><span class="badge">SKILL 03</span>双人游戏开场视频生成器<span class="words">约 2570 字</span></h2>
+  <div class="skill-desc">面向想制作双人合作游戏主菜单或开场动画的用户。用户需提供两位玩家名称、游戏名称、目标视觉风格，并可上传角色参考图。Skill 会先锁定人物身份特征，基于固定菜单布局生成与色彩、按钮、图标和字体联动的确认首图；用户确认后，回填角色、界面文案和事件节奏，生成完整视频提示词并制作最终开场视频。最终输出一条包含双人角色、玩家信息卡和主菜单交互动效的游戏开场视频。适用于合作游戏概念展示、角色化菜单和社交内容，不适用于完整可玩游戏开发、复杂多页面 UI、精确品牌标识复刻或无角色的通用片头。</div>
+  <div class="skill-meta"><b>name:</b> <code>co-op-game-intro-generator</code></div>
+</div>
+<div class="skill-body">
+<h1>双人游戏开场视频生成器</h1>
+<p>当用户想做一条双人游戏开场视频，并且希望先用一张图确认风格、人物和 UI 再生成最终视频时，使用这个 Skill。流程重点是：弹窗选择风格、收集玩家名/游戏名/角色图、按源提示词框架生成首图、确认后回填 H3 视频 prompt 并直接生成视频。</p>
+<h2>STEP 1：询问视觉风格</h2>
+<p>先用弹窗式问题给出预设风格和自定义选项，让用户先选整体画风。用户选择的风格是最高优先级，会影响整体风格补充、色彩语言、背景纹理、人物画风、表情气质、穿搭风格、UI颜色、按钮图标和字体质感。</p>
+<h2>STEP 2：收集玩家与游戏信息</h2>
+<p>让用户填写 PLAYER 1 名字、PLAYER 2 名字、游戏名字。若用户有角色图，则上传 PLAYER 1 / PLAYER 2 参考图；上传图只用于身份映射：可识别脸型轮廓、发型、眼镜、五官相对比例和个人特征。不要继承真人摄影质感、皮肤纹理、现实光影、相机质感或原图风格；人脸必须在保留身份锚点的前提下重绘为用户选择的视觉风格。</p>
+<h2>STEP 3：生成 GPT 首图提示词</h2>
+<p>GPT 首图提示词必须采用“框架固定 + 风格动态填充 + 颜色联动”的写法：</p>
+<ol>
+<li><strong>整体风格</strong>：固定保留“游戏主菜单 UI、高品质游戏宣传海报、UI 与角色深度融合、现代商业游戏 UI 设计、极强视觉冲击力、画面简洁干净、避免过度装饰”；其他风格词根据用户选择补充。</li>
+<li><strong>色彩设计</strong>：固定使用“xx 色作为主体颜色、xx 色作为 UI 主体颜色、xx 色作为文字颜色、xx 色作为功能强调色、红色作为危险提示色、整体颜色控制在 5 种以内、高对比撞色、鲜明现代、xx 风格色彩语言”的结构；具体颜色根据用户风格推导。后续 UI、按钮、图标、字体段落必须与本段色彩保持一致。</li>
+<li><strong>整体布局</strong>：固定保留 16:9 横版构图、背景铺满、中央放置 x 位角色、UI 围绕角色不遮挡、左上玩家信息卡、右侧纵向菜单、底部警戒胶带、四角少量涂鸦、Z 字阅读路径、留白充足、层级清晰、视觉重心集中 Continue。</li>
+<li><strong>背景设计</strong>：固定使用“纯 xx 色背景、轻微 xx 纹理、大面积纯色留白、纹理仅作细节、避免大量脏污/密集划痕/过多泼墨/大面积油漆飞溅、边缘少量黑色喷漆、整体简洁现代高级、突出 UI 主体”的结构；xx 根据用户风格推导，其他背景补充也根据用户选择风格生成。</li>
+<li><strong>人物风格</strong>：严格按照用户选择的风格拓展，参考源提示词的文本维度，但不可用源默认风格压过用户选择。</li>
+<li><strong>左侧人物 Character A</strong>：五官信息参考角色图 1；表情、画风、穿搭根据用户选择风格分析并改写；可参考“卡其色短夹克、黑色内搭、黑色工装裤、棕色皮靴、探险家风格穿搭”等维度，但必须服务用户风格；动作固定为双腿交叉坐地、双手撑地、身体微微后仰、抬头望向镜头。</li>
+<li><strong>右侧人物 Character B</strong>：五官信息参考角色图 2；表情、画风、穿搭根据用户选择风格分析并改写；可参考“绿色厚夹克、酒红色羽绒内胆、白色内衬、黑色长裤、厚底皮靴”等维度，但必须服务用户风格；动作固定为双腿盘坐、双手自然放于腿前、身体略微前倾、正视镜头。</li>
+<li><strong>灯光表现 Lighting</strong>：固定保留顶部主光源、左上暖色或冷色补光、底部柔和环境反光、柔软阴影、明显接触阴影、轻微轮廓光、高质量 GI 全局光照、人物自然融入背景。冷暖选择根据用户风格推导。</li>
+<li><strong>UI 整体设计 Game UI</strong>：固定保留 Console Game Menu 风格、按钮统一尺寸、统一圆角矩形、略微倾斜布局、少量喷漆与滴落元素、现代简洁、贴纸化设计、突出可读性、避免过度装饰。按钮主体色、描边色、发光描边色必须匹配第 2 点色彩设计。</li>
+<li><strong>UI 排版规则 Layout Rules</strong>：保持不变：所有菜单按钮横向长条、统一宽高与圆角、按钮宽度适配文字、标题单行显示、严禁换行、严禁两行标题、文字水平居中、左右留白一致、垂直间距统一。</li>
+<li><strong>按钮设计 Buttons</strong>：根据第 2 点色彩设计修改颜色，可适当修改图标，但必须符合用户风格选择。Continue 是视觉中心、超大尺寸、最强高亮、鼠标悬停/点击状态；Start New Game 位于 Continue 上方；Settings 保持统一视觉语言；Exit Game 使用危险/退出提示，可保留红色危险点缀。</li>
+<li><strong>玩家信息卡 Player Cards</strong>：固定保留左上角 x 名玩家信息栏、不规则矩形卡片、描边、轻微破损、左侧 Logo/图标、右侧三级信息（PLAYER 名称、玩家昵称、READY 状态）、粗体无衬线字体、工业贴纸设计。卡片颜色、描边色、READY 颜色、Logo 风格根据第 2 点和用户风格生成。</li>
+<li><strong>图标设计 Icon System</strong>：图标风格根据用户选择动态生成，颜色匹配第 2 点色彩设计；排列规则和禁止要求保持不变：单排横向、严禁自动换行、严禁上下堆叠、每个 UI 模块最多一排图标、数量精简、统一尺寸、不抢视觉焦点。</li>
+<li><strong>字体设计 Typography</strong>：保持源框架：超粗无衬线、全部大写、类似 Anton/Impact/Burbank/Tungsten、字距紧凑、笔画粗壮、信息层级明确、单行排版、禁止自动换行、按钮宽度优先适配文字长度、任何情况不得出现两行菜单标题。字体颜色和纹理根据第 2 点色彩设计与用户风格匹配。</li>
+</ol>
+<h2>STEP 4：生成首张确认图</h2>
+<p>先只出一张图给用户确认，不要直接进入视频。首图需要保留框架结构，同时让用户选择的风格在视觉上明确成立。</p>
+<h2>STEP 5：等待用户确认</h2>
+<p>在用户确认首图或提出修改之前，不要生成视频。如果用户改了风格、名字、游戏名、角色形象或首图问题，就回到首图提示词阶段重写并再生成。</p>
+<h2>STEP 6：回填视频 prompt，并用 Minimax H3 生成</h2>
+<p>首图确认后，再把确认结果回填进完整视频 prompt，包括风格、角色参考、玩家名字、游戏名字、UI 文案和负面约束，然后直接用 Minimax H3 生成最终视频。</p>
+<h2>STEP 7：常见失败修正</h2>
+<p>如果文字不清楚，就减少画面中的文字量；如果角色串位，就强化名字、左右位置和颜色区分；如果脸型或发型漂移，就继续沿用上传角色图，并明确保留身份锚点、发型和服装锚点，同时保持人脸按用户选择的视觉风格渲染；如果画面没有体现用户风格，就重写整体风格、色彩设计、人物风格、背景纹理、UI颜色、按钮、图标和字体段落，而不是改动布局框架。</p>
+</div>
+</section>
+<section class="skill-card" id="skill-4">
+
+<div class="skill-head" style="background:linear-gradient(120deg,#db2777,#9333ea)">
+  <h2><span class="badge">SKILL 04</span>手绘实拍视频生成器<span class="words">约 2218 字</span></h2>
+  <div class="skill-desc">面向希望制作手绘动画与实拍空间融合短片的创作者。用户提供场景创意、接触对象或手部动作、情绪氛围和可选风格限制。Skill 会明确真实触碰关系，设计连续变形、逃跑路线和慢半拍手持追拍，整理为用户输入语言的15秒16:9视频提示词；用户确认后建议使用 MiniMax H3 生成，并检查接触真实感、镜头延迟、粗糙发光笔触和非恐怖调性。适用于单场景创意短片和手绘实拍融合视频，不适用于精致CG、恐怖跳吓、毛绒角色或多场景剪辑。</div>
+  <div class="skill-meta"><b>name:</b> <code>handdrawn-live-video-generator</code><span><b>触发词:</b></span><span class="pill">手绘发光动画实拍融合</span><span class="pill">15秒变形追逐视频提示词</span><span class="pill">Seedance视频prompt</span><span class="pill">H3生成视频</span><span class="pill">视频prompt</span><span class="pill">手绘动画接触真实物体</span><span class="pill">蜡笔粉笔质感</span><span class="pill">多语言视频提示词</span></div>
+</div>
+<div class="skill-body">
+<h1>手绘实拍视频生成器</h1>
+<p>当用户想要一个<strong>15 秒、16:9 的手绘实拍融合成片</strong>时，使用本 Skill。输出必须保留固定结构：平面手绘发光动画出现在真实空间中，0-3 秒内与实拍手或物体明确接触，作为同一个实体连续变形、逃跑，并由慢半拍的手持手机镜头追随。</p>
+<p>本 Skill <strong>先按用户输入语言整理 prompt，并把 MiniMax H3 作为用户确认后的生成步骤</strong>。用户明确确认 H3 生成前，不生成视频。不要为单纯 prompt 写作转交 planner 或 executor。最终 prompt 的语言必须跟随用户输入的主语言：用户用中文就写中文，用户用英语就写英语，用户用日语就写日语；混合输入时使用占主导的语言；难以判断时使用当前对话语言。只有用户要求保留的专名、模型名或字面参数可以原样保留。</p>
+<h2>Step 1：把用户意图理解为同语种约束</h2>
+<p>当用户提供任何语言时，把它理解为以下 workflow 要求，并用用户输入的主语言表达最终 prompt：</p>
+<ul>
+<li>基于参考 prompt 创作一个全新的 15 秒视频生成 prompt，不要表面模仿原句。</li>
+<li>必须保留影像结构：实拍空间中出现平面的手绘发光动画；动画与真实手或真实物体接触；同一个存在连续变形并逃跑；相机总是慢半拍追赶。</li>
+<li>手绘动画质感必须像蜡笔、粉笔、彩色铅笔、粉彩、粗糙笔刷；线条轻微抖动，有涂抹不均、毛边和逐帧重画感。</li>
+<li>禁止 3DCG、毛绒玩具感、均匀矢量线、平滑霓虹、恐怖怪物、巨大眼睛、裂口、牙齿、威吓、扑咬、突然黑屏、跳吓。</li>
+<li>0-3 秒必须出现实拍手与手绘动画的清晰接触，例如缠住手指、落在掌心、被抓时逃跑、从指尖诞生。</li>
+<li>动画必须作为同一个实体连续变形，可在“线条、生物、记号、植物、交通工具、生活小物”等形态之间变化，并保留前一形态的痕迹。</li>
+<li>不允许突然出现另一个全新角色。</li>
+<li>全片在同一空间或相邻范围内连续展开，不用剪辑跳到另一个地点，像拍摄者真的边走边追。</li>
+<li>每个区间 0-3、3-6、6-10、10-13、13-15 秒都要有新的变形、移动、接触、发现、恶作剧或惊喜。</li>
+<li>拍摄者也必须参与：伸手、抓、追、打开门或盒子、接住、后退、被恶作剧等。</li>
+<li>调性是可爱、生活感、怀旧、温柔、略带切感，不是恐怖喜剧。</li>
+<li>13-15 秒必须有空间级变形：之前的线扩散到墙、地板、天花板、窗户、水槽或通道，变成巨大花、星空、夕阳、云、丝带、涂鸦小镇等；结尾要有感动余韵和一点可爱笑点。</li>
+</ul>
+<h2>Step 2：每次都重新发明创意内容</h2>
+<p>每次运行都创建新的组合。不要复用参考 prompt 中的暗房、电脑、冰箱、星星、爱心、蓝色漩涡、蝴蝶、蛇、章鱼、汉堡、巨大眼睛、牙齿或黑暗结尾。</p>
+<p>为以下元素选择新值：</p>
+<ol>
+<li>实拍空间，但仍是生活化且可连续追踪的相邻范围；</li>
+<li>手绘实体或初始形态；</li>
+<li>中心色彩；</li>
+<li>连续变形链路；</li>
+<li>与真实手或实物的接触方式；</li>
+<li>在空间中的追逐路线；</li>
+<li>拍摄者反应；</li>
+<li>最后的空间级变形与可爱笑点。</li>
+</ol>
+<p>可用方向包括：雨天厨房水槽、旧阳台晾衣角、清晨玄关、小书店走廊、火车窗边小桌、浴室镜柜、手作桌、温室通道、自助洗衣店长椅、旧餐桌。只使用一个空间或相邻连接区域。</p>
+<h2>Step 3：必需输出格式</h2>
+<p>最终 prompt 必须以与用户输入主语言一致的句式开头。中文输入使用这个句式：</p>
+<p><code>15秒，16:9横版视频。将实拍的〇〇与手绘发光动画融合的影像。</code></p>
+<p>把“〇〇”替换为新创作的实拍空间或日常场景。非中文输入时，使用含义等价的同语种开头，必须包含时长、16:9 横版、实拍空间、手绘发光动画融合四个信息。</p>
+<p>不要添加标题、舞台设置、色味等辅助小标题，也不要加解释说明。保持以下段落顺序：</p>
+<ol>
+<li>开头句；</li>
+<li>实拍空间与手机拍摄质感；</li>
+<li>0-3 秒；</li>
+<li>3-6 秒；</li>
+<li>6-10 秒；</li>
+<li>10-13 秒；</li>
+<li>13-15 秒；</li>
+<li>手绘质感；</li>
+<li>相机追随方式；</li>
+<li>禁止事项；</li>
+<li>环境音。</li>
+</ol>
+<h2>Step 4：Prompt 写作规则</h2>
+<ul>
+<li>保持 prompt 可直接用于视频生成，不写成散文。</li>
+<li>除非用户要求解释，最终回答先给与用户输入主语言一致的 prompt 文本，再给一句同语种下一步建议。</li>
+<li>下一步建议必须使用同语种邀请用户使用 MiniMax H3 生成 15 秒 16:9 视频。中文示例：<code>下一步建议：如果你确认这个 prompt，我可以继续用 H3 模型生成 15 秒 16:9 视频。</code></li>
+<li>用户明确确认 H3 生成前，不生成视频、图片、音频、分镜或中间资产。</li>
+<li>只有用户要求时才把 Seedance 作为目标使用语境提及；不要在创意 prompt 内添加模型参数，除非用户要求。</li>
+<li>0-3 秒必须通过接触让实拍与手绘融合显而易见。</li>
+<li>相机不要把动画稳定居中。它应该慢半拍，在实体已经离开画面边缘后再平移、俯仰或前进。</li>
+<li>实体必须可追踪：每个新形态都保留上一形态的线、尾巴、色彩拖痕、身体曲线或图案母题。</li>
+<li>使用柔软、情绪化、可爱漫画节拍：小小踉跄、害羞手势、一个点掉队、花瓣粘到镜头、星星落进掌心、彩纸喷嚏、一个小生物慢半拍落后。</li>
+<li>避免任何恐怖编码的解剖结构或威胁性动作。</li>
+<li>最终 prompt 不得无故混入非用户主语言的词汇、过渡句或脚本；用户主语言本身是日语时，可以自然使用日语。</li>
+</ul>
+<h2>Step 5：交付</h2>
+<p>先按要求输出与用户输入主语言一致的最终 prompt。随后只添加一句同语种下一步建议，邀请用户确认后继续用 MiniMax H3 生成 15 秒 16:9 视频。不要包含标题、清单、文件名或画布交付说明。用户后续确认 H3 生成后，再生成视频并检查接触、连续变形、慢半拍追拍和非恐怖手绘质感是否成立。</p>
+</div>
+</section>
+<section class="skill-card" id="skill-5">
+
+<div class="skill-head" style="background:linear-gradient(120deg,#ea580c,#db2777)">
+  <h2><span class="badge">SKILL 05</span>极简产品广告生成器<span class="words">约 9424 字</span></h2>
+  <div class="skill-desc">上传一张产品图，就能按 Apple 风做一条高级产品广告短片。适合电商商品、小品牌新品、潮玩、食品、数码配件等产品展示：我会先帮你确认时长、比例和风格，再提炼产品卖点、生成英文广告文案、制作产品锚定图、规划文字卡点分镜，并生成一条干净、有节奏、产品质感突出的短片。不适合 KOC 口播、普通剪辑或复杂屏幕演示。</div>
+  <div class="skill-meta"><b>name:</b> <code>minimalist-product-ad-generator</code><span><b>触发词:</b></span><span class="pill">minimalist product ad</span><span class="pill">premium product ad</span><span class="pill">minimalist product film</span><span class="pill">极简产品广告</span><span class="pill">高质感产品广告</span><span class="pill">产品广告片</span><span class="pill">电商产品视频</span><span class="pill">新品发布广告</span></div>
+</div>
+<div class="skill-body">
+<h1>极简产品广告生成器</h1>
+<p>使用本 Skill 引导无专业制作能力的用户，通过流程型方式制作“苹果味儿”的产品广告片。目标用户是电商卖家、小品牌主理人、独立创作者和个人卖家；用户至少应提供一张商品图或相关素材。</p>
+<p>核心原则是：<strong>先确认素材与简报，再建立产品事实和叙事脊柱，用独立锚定照片锁定产品视觉，用精确节拍分镜控制视频，最后用原生音频或音乐卡点完成成片。</strong> 本 Skill 不再默认使用四宫格锚定图，因为视频模型可能把宫格版式带进最终画面；默认使用三张独立锚定照片和一张精确节拍文字分镜表来控制视频。</p>
+<h2>启动前询问</h2>
+<p>每次触发本 Skill 后，正式进入分析、文案、锚定图或视频生成前，必须先做一次完整但轻量的启动问询。问询只确认制作必需信息，不问音乐；配乐在后续配乐步骤再处理。</p>
+<p>启动问询必须一次性确认：</p>
+<ol>
+<li>
+<p><strong>商品图和相关素材</strong>
+   - 请用户上传商品图和相关素材，可包括产品图、包装图、渲染图、细节图、已有视频素材或希望参考的视觉素材。
+   - 如果本轮消息或当前画布 / 会话中已经有素材，直接说明已检测到素材，不重复要求上传，只确认是否使用当前素材。
+   - 如果有多张候选素材且角色不清，才请用户确认哪张作为主商品图。</p>
+</li>
+<li>
+<p><strong>商品款式情况</strong>
+   - 确认是单款商品，还是多款式 / 多颜色 / 多型号商品。
+   - 如果是多款式，确认哪个作为主推款。
+   - 如果用户不指定，agent 可根据产品图推荐一个主推款，但后续分镜表必须写成具体色名或具体款式名。</p>
+</li>
+<li>
+<p><strong>目标时长</strong>
+   - 5 秒 / 10 秒 / 15 秒，默认推荐 10 秒。</p>
+</li>
+<li>
+<p><strong>画幅比例</strong>
+   - 16:9 / 9:16 / 1:1 / 4:3 / 3:4 / 匹配参考图。
+   - 视频比例一旦由用户选择，后续锚定图、视频和最终成片都必须严格沿用。</p>
+</li>
+<li>
+<p><strong>苹果风模板</strong>
+   - 白色科技风 / 黑底轮廓光 / 品牌色块 / 生活方式轻场景。</p>
+</li>
+<li>
+<p><strong>画面文案</strong>
+   - 用户已有文案，或由 agent 生成英文 Apple 风文案。</p>
+</li>
+<li>
+<p><strong>视频模型策略</strong>
+   - 默认模型是 MiniMax-H3，因为它通常更容易生成干净的 Apple 感产品近景、留白和高级产品片镜头语言。
+   - 启动问询时不要让用户选择视频模型；只需在已采用的启动结果中展示“默认模型：MiniMax-H3”。
+   - 如果用户明确指定其他模型，经过能力检查后遵循用户选择。
+   - Seedance 只在用户明确想要更强多分镜执行、用户点名 Seedance，或 H3 失败 / 无法满足结构且用户接受兜底时使用。</p>
+</li>
+</ol>
+<p>启动问询是强制 Gate。即使用户已经上传了商品素材，也只能跳过“请上传素材”这一步；不能跳过其余启动问询。agent 仍必须在进入产品分析、锚定图、分镜或视频生成前，一次性确认商品款式情况、目标时长、画幅比例、苹果风模板和画面文案方式。视频模型不是启动问询问题：默认使用 MiniMax-H3，并在已完成的启动问询结果中展示。如果用户说“你看着办 / 直接做”，agent 可以为其余字段选择推荐默认值，但仍必须把采用的选择作为已完成的启动问询结果展示出来，再继续下一步。</p>
+<h2>运行原则</h2>
+<ol>
+<li>
+<p><strong>默认用独立锚定照片作为视觉控制系统</strong>
+   - 默认生成三张独立锚定照片，而不是一张四宫格锚定图，因为视频模型可能把宫格版式复制进最终成片。
+   - 三张锚定照片通常分别承担：主视觉 / 刁钻主视角、材质或功能细节、结尾文案构图。
+   - 当结构动作与主视角重叠时，不要单独生成结构动作锚定照；除非产品确实需要独立机制参考，否则把结构 / 动作线索合并进材质细节锚定照。
+   - 每张锚定照片都必须是一张可独立成立的完整产品照片。禁止生成网格、分屏、拼贴板、画框、多面板、产品墙或分镜板。
+   - 精确节拍分镜表才决定真正的镜头顺序、动作和文字出现方式；不要把锚定照片直接当成视频镜头。</p>
+</li>
+<li>
+<p><strong>画面文案必须作为视频内一体化动效出现，而不是字幕兜底</strong>
+   - 文案锚定照片里的文字只作为字体、位置、单行排版和两段配色参考，不代表整条视频只能使用这一句文案。
+   - 精确节拍分镜表可以按镜头定义多句短英文文案；每句必须是 3-5 个英文词、单行、可读，并遵守两段配色规则：白色科技风前半用黑色或深灰，黑底轮廓光前半才可用白色，后半始终用具体商品色。不要写 1-2 个词的孤立功能标签。
+   - 视频生成时必须让分镜表里的文案出现在画面里。
+   - 文案不要求每个镜头都有；如果视频模型文字容易出错，必须主动减少文字出现次数。10 秒片通常只保留 1 次中段文案 + 1 次结尾文案，不要每个镜头都有文字；结尾必须有一条稳定单行文案。
+   - 默认让视频模型直接生成画面文字和文字卡点时机。不得擅自把文字退化成后期字幕，也不得只给后期叠字预留空位。只有用户明确要求后期叠字，或视频内一体化文字失败且用户接受兜底时，才使用后期文字方案。</p>
+</li>
+<li>
+<p><strong>产品本体颜色是硬保真约束</strong>
+   - Apple 风指的是干净构图、高级光线、克制运动和留白，不代表把产品本体变成白色、银灰或 AirPods 风。
+   - 必须在所有锚定照片和视频中保留用户原图里的产品本体颜色、点缀色、材质色相和可见表面质感。
+   - 只有背景、光线环境和构图可以转向所选 Apple 风模板；除非用户明确要求，绝不能重染产品本体颜色。
+   - 最终文案强调色必须来自产品真实主色，不能擅自使用通用银灰 / 白色 Apple 色盘。</p>
+</li>
+<li>
+<p><strong>每个产品都要有专属叙事</strong>
+   - 不套固定耳机模板，也不写“产品状态变化”这类空话。
+   - 分镜必须基于产品品类、形态、材质、结构和可展示动作。
+   - 动态必须可视化，例如“盒盖打开 30 度，内部反光出现”“表冠轻旋，边缘高光滑过”。</p>
+</li>
+<li>
+<p><strong>每一步都有可见进度</strong>
+   - 每完成一步，都展示产物和下一步需要用户决定的内容。
+   - 不要未经用户确认直接跑完整链路。</p>
+</li>
+</ol>
+<h2>文字规范</h2>
+<ul>
+<li>画面内广告文案强制使用英文。</li>
+<li>如果用户输入中文文案，要翻译成简洁英文，或让用户确认英文化版本。</li>
+<li>可见画面文案必须是 3-5 个英文词，尽量不超过 32 个英文字符含空格；不要写 1-2 个词的孤立功能标签。</li>
+<li>文案偏 Apple 产品片：感受、功能收益、材质体验、轻盈价值主张；不要促销口号，不要像电商卖点小标题。</li>
+<li>字体参考：SF Pro Display / SF Pro Text。画面提示词优先写 <code>SF Pro Display Semibold</code>。</li>
+<li>单镜头内文字颜色不超过两种。</li>
+<li>白色科技风中，文字前半段必须使用黑色或深灰，禁止使用白色文字；黑底轮廓光中，文字前半段才允许使用白色。后半段始终使用具体商品色。</li>
+<li>文字必须单行，不换行、不堆叠、不拆成多行。</li>
+<li>同一时间画面里只允许出现一条单行英文文案；禁止上下两排文字、双行标题、主副标题并列、两处文字同时出现。两段式文案也必须在同一行内接续或替换，不能分成上下两行。</li>
+<li>文字不要放在下方字幕位。优先放在上下居中的视觉区域，靠左或靠右参与画面构图，字号略大，像产品片里的画面元素，而不是说明字幕。</li>
+<li>用户认可的中段范式：干净留白、产品动作或产品特写主导、画面不拥挤，只出现一条单行英文文案；文字贴近产品边缘、产品表面或特写高光区，像产品画面的一部分，而不是悬浮字幕。不要因为加文字而破坏留白，也不要增加第二处文字。</li>
+<li>默认两段式文字动效必须保留：前半部分先淡入或轻微滑入，后半部分随后淡入或轻微滑入；后半出现时，前半在同一行内轻轻位移，为后半让出空间。</li>
+<li>位移要轻，约 10-15px 或 8-12% 字宽；动效要顺滑、克制，不要弹跳、霓虹或花哨界面感。</li>
+<li>禁止为了避免两排文字而把文字做成完全静态。正确做法是保留同一行内的两段式进入、轻位移、淡入或轻滑入；错误做法是上下分行、双行标题或取消文字动效。</li>
+</ul>
+<h2>步骤 1：素材检查与产品事实摘要</h2>
+<p>如果没有商品素材，先请用户上传。若已有素材，直接使用并分析：</p>
+<ul>
+<li>产品品类。</li>
+<li>主体位置和画面占比。</li>
+<li>图片质量：清晰度、光线、构图、产品细节是否可见。</li>
+<li>商品主色和可选主推款。</li>
+<li>可展示结构：开合、旋转、升起、扣合、折叠、弹出、发光、屏幕、纹理等。</li>
+<li>可用于分镜的真实外观特征：材质、边缘、按钮、接口、包装、透明件、屏幕或独特轮廓。</li>
+</ul>
+<p>如果图片质量不达标，应暂停流程并给出具体重拍建议。</p>
+<p>输出简短的产品事实摘要：</p>
+<ul>
+<li>使用的素材。</li>
+<li>产品品类。</li>
+<li>主色候选与主推款建议。</li>
+<li>质量是否通过。</li>
+<li>可展示结构 / 特征。</li>
+</ul>
+<h2>步骤 2：确认制作简报</h2>
+<p>根据启动问询结果整理一份可执行制作简报，不要重复追问已经确认过的参数。简报用于后续叙事脊柱、文案、锚定图和分镜表。</p>
+<p>制作简报必须包含：</p>
+<ul>
+<li>使用的商品素材。</li>
+<li>主推款 / 商品主色。</li>
+<li>视频比例。</li>
+<li>目标时长。</li>
+<li>已选苹果风模板。</li>
+<li>单款 / 多款式策略。</li>
+<li>画面文案方式：用户已有文案，或由 agent 生成英文 Apple 风文案。</li>
+</ul>
+<p>多款式产品规则：</p>
+<ul>
+<li>用户选的是风格，不是先砍掉所有其他款式。</li>
+<li>每个多款式项目都要先决定 1 个主推款。</li>
+<li>其他款式不要一开始全部平铺；只在过程节点、过渡段或结尾全套展示时出现。</li>
+<li>若用户没有指定主推款，agent 可选择视觉最稳的款式做主推款，其余款式做节奏和层次。</li>
+<li>禁止电商矩阵、九宫格、堆叠、散乱摆放、所有颜色平铺、满屏商品墙。</li>
+</ul>
+<h2>步骤 3：选择产品叙事脊柱</h2>
+<p>在文案和锚定图之前，先选择一条轻量的产品叙事脊柱。不要使用大而泛的品牌片结构；本 Skill 聚焦实体商品的 Apple 风短片。</p>
+<p>如果用户尚未选定方向，给出 2-3 个简短方向，推荐一个，并在确认后继续。若用户说“你看着办”，直接采用推荐方向。</p>
+<p>推荐脊柱：</p>
+<ol>
+<li>
+<p><strong>产品发布型</strong>（默认推荐）
+   - 留白开场 → 主推款建立主视觉 → 材质 / 结构特写 → 产品自然动作 → 多款式或色彩关系 → 完整文案收束。
+   - 适合耳机、手表、数码配件、小家电、香薰等。</p>
+</li>
+<li>
+<p><strong>功能触感型</strong>
+   - 产品静置 → 交互触发 → 功能动作出现 → 特征细节放大 → 使用结果 / 感受 → 收束画面。
+   - 适合有明确开合、旋转、磁吸、灯光、屏幕、折叠、喷雾等动作的产品。</p>
+</li>
+<li>
+<p><strong>色彩家族型</strong>
+   - 主推款单独出现 → 辅助款轻量滑入 → 色彩关系形成秩序 → 材质和结构统一 → 全套收束 → 文案落定。
+   - 适合多颜色、多款式、多型号产品。</p>
+</li>
+</ol>
+<p>输出一句“本片叙事脊柱”，例如：</p>
+<blockquote>
+<p>本片采用“色彩家族型”：紫色主推款建立主视觉，其他颜色作为辅助层次进入，最后全套产品与英文文案收束。</p>
+</blockquote>
+<h2>步骤 4：导演动效语言</h2>
+<p>在生成文案和锚定图之前，定义本片的运动语言。它不生成素材，只规定后续分镜的运动强度、转场逻辑和节奏峰值。</p>
+<p>规则：</p>
+<ol>
+<li>
+<p><strong>转场由产品或画面真实元素驱动</strong>
+   - 优先使用产品边缘、材质高光、开合 / 旋转 / 吸附 / 滑入等真实动作、多款式排列的几何变化、色彩关系的进入和退出、镜头方向或产品轮廓的匹配。
+   - 不要用无意义闪白、抽象粒子、随机光效或随机切镜来假装高级。</p>
+</li>
+<li>
+<p><strong>每个节拍只保留一个主要动作</strong>
+   - 次级元素要稍作延迟，不能同时抢画面。
+   - 例如：先产品进入，再文字出现；先主推款稳定，再辅助款滑入；先材质高光扫过，再进入文字动效。</p>
+</li>
+<li>
+<p><strong>设置强弱节奏</strong>
+   - 5 秒片：1 个小峰值 + 1 个稳定收束。
+   - 10 秒片：1-2 个峰值 + 1-2 个制动时刻。
+   - 15 秒片：2-3 个峰值 + 2 个安静制动时刻。
+   - 峰值可以是产品动作完成、多款式进入、文案后半段出现或全产品结尾收束。
+   - 制动可以是材质特写停顿、文案稳定可读或结尾画面定住。</p>
+</li>
+<li>
+<p><strong>保持安全空间</strong>
+   - 产品轮廓清楚，单行文案可读，主推款不被遮挡。
+   - 只有用户提供品牌标识时才加入标识；没有提供时不生成假标识。</p>
+</li>
+<li>
+<p><strong>禁止伪科技装饰、镜面白底和空镜拖时间</strong>
+   - 避免虚假科技界面、无意义玻璃卡片、装饰性文字墙、未经确认的数据指标、随机粒子和光效堆叠、全片同一种缓动、满屏商品墙。
+   - 白色科技风不是镜面白底，也不是死白平光；禁止把产品放在反光地面、玻璃台面或廉价影棚镜面上。
+   - Apple 风白色空间应尽量是单纯白色背景，靠抓人眼球的产品视角、产品真实动作、运镜节奏和留白构图产生震撼，而不是靠镜面反射或空镜拖时间。
+   - 开头不能只是空白等待；必须尽快给出一个有吸引力的产品动作或视角，例如产品从结构内部丝滑旋转出现、从开合结构中露出、沿产品轮廓滑出、由边缘高光带出主体。具体动作必须根据当前产品形态推导，不能固定写成耳机仓。</p>
+</li>
+</ol>
+<p>输出一段“本片动效语言”，例如：</p>
+<blockquote>
+<p>本片以产品边缘高光和紫色主推款滑入驱动转场，主要峰值放在多款式进入和完整文案落定，结尾用稳定制动保留产品与文案。</p>
+</blockquote>
+<h2>步骤 5：生成或确认 Apple 风英文文案</h2>
+<p>在生成文字锚点和分镜之前，必须先得到可用于画面的英文文案。</p>
+<p>规则：</p>
+<ol>
+<li>分析产品品类、使用感受和叙事脊柱。</li>
+<li>生成 2-3 个 3-5 词 Apple 风英文候选。</li>
+<li>不要使用固定模板或固定口号；每个产品都要重新推导。</li>
+<li>避免促销词。</li>
+<li>如果用户已有文案，优先使用用户文案；中文文案需要英文化。</li>
+</ol>
+<p>用户确认文案后，再进入锚定图生成。若用户授权“你看着办”，agent 自选推荐文案继续。</p>
+<h2>步骤 6：生成三张独立产品锚定照片</h2>
+<p>生成 <strong>三张独立锚定照片</strong>，比例和分辨率必须与用户选择的视频尺寸一致。它们必须是三张独立图片输出，不是一张三宫格或四宫格合成图。背景根据已选风格确定，三张照片必须统一光、影、调色和背景语言，同时每张都能作为独立产品照片成立。</p>
+<p>锚定照片角色：</p>
+<ul>
+<li>照片 1：主视觉 / 刁钻主视角锚点，锁定最有吸引力的产品视角、轮廓和开场视觉方向。避免把难看的材质极近景作为开场参考。</li>
+<li>照片 2：材质 / 功能细节锚点，锁定表面材质、颗粒、反光、触感，以及最重要的可见结构或机制。如果产品需要开合、入仓、折叠、扣合、按钮、接口、盖子、屏幕或触控线索，把这些线索合并进这张图。</li>
+<li>照片 3：结尾文案锚点，锁定最终产品构图、字体气质、文字位置、单行排版和两段配色方式。该文案只是格式参考，不限制后续视频只能使用这一句。</li>
+</ul>
+<p>多款式产品处理：</p>
+<ul>
+<li>锚定照片必须继承已选叙事脊柱和风格策略。</li>
+<li>照片 1/2 优先围绕主推款建立视觉系统。</li>
+<li>其他款式只做辅助节奏，不要满屏平铺。</li>
+<li>照片 3 可以展示主推款 + 少量辅助款，或全套收束构图，但必须保持留白和秩序。</li>
+</ul>
+<p>结尾文案锚定照片文字规则：</p>
+<ul>
+<li>必须包含步骤 5 已确认文案，不要使用占位文案。</li>
+<li>文字必须单行。</li>
+<li>字体：SF Pro Display Semibold。</li>
+<li>文字颜色必须明确拆成两段：文案前半段使用黑色或白色，文案后半段使用具体商品主色；例如主色是紫色，就写“前半黑 / 白，后半紫色”。不要只写“商品色 + 黑或白”。</li>
+<li>照片 3 只能包含这一条格式参考文案，不能出现其他文字；但后续视频文案以精确节拍分镜表为准，可以有多句短英文文案。</li>
+</ul>
+<p>展示三张独立锚定照片，让用户批准、编辑或指定重做某一张后，再进入精确节拍分镜表。</p>
+<h2>步骤 7：精确节拍与文字分镜表</h2>
+<p>生成任何视频片段前，必须先创建并读回一张精确节拍文字分镜表。它不是美术图，而是给视频模型看的执行表。</p>
+<p>分镜表必须按“用户选择陈述 → 节拍内容 → 需要注意的原则”组织。</p>
+<h3>用户选择陈述</h3>
+<p>写明已确认的风格、比例、时长、叙事脊柱、主推款、商品主色、款式策略和文案。例如：</p>
+<blockquote>
+<p>白色科技风，16:9，10 秒，色彩家族型，紫色为主推款，其他颜色作为辅助层次，文案为 Color Meets Sound。</p>
+</blockquote>
+<h3>节拍内容表</h3>
+<p>建议表头：</p>
+<table>
+<thead>
+<tr>
+<th>时间段</th>
+<th>镜头</th>
+<th>镜头目的</th>
+<th>视觉主导</th>
+<th>画面 / 运镜</th>
+<th>款式状态</th>
+<th>文案内容</th>
+<th>文字颜色</th>
+<th>文字效果</th>
+<th>转场 / 连贯</th>
+<th>节奏意图</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p>表格规则：</p>
+<ul>
+<li>5 秒建议 3-4 个节拍。</li>
+<li>10 秒建议 5-7 个节拍。</li>
+<li>15 秒建议 6-9 个节拍。</li>
+<li>时间段用秒，不强制写帧号。</li>
+<li>每个节拍只保留一个主要动作，次级动作延迟出现。</li>
+<li>明确主推款何时单独出现，其他款式何时进入，全套何时收束。</li>
+<li>文案拆分只能用自然语言描述“前半 / 后半”，禁止写箭头、斜杠、加号或连接符，避免模型把符号当成画面文案。</li>
+<li>文字颜色必须写具体商品色，并且按风格明确拆成两段：白色科技风写“前半黑色或深灰，后半具体商品色”；黑底轮廓光才可写“前半白色，后半具体商品色”。例如白色科技风主色为紫色时，写“前半黑色或深灰，后半紫色”。不要写“商品色 + 黑或白”。</li>
+<li>如果文字容易出错，优先减少文字镜头：10 秒片通常只安排 1 次中段文字和 1 次结尾文字，其他节拍写“无文字”。不要每个镜头都有文字。</li>
+<li>结尾必须是“单一全画幅产品收束 + 完整单行文案”的稳定画面；严禁结尾出现四宫格、分屏、分镜板、锚定图布局、产品小窗或画框。文字仍应在上下居中的构图区，靠左或靠右成为画面的一部分，不要放在下方字幕位；只有用户提供品牌标识时才加入标识。</li>
+</ul>
+<p>节奏意图可使用：铺垫、建立、预备、冲击、制动、稳定。</p>
+<h3>需要注意的原则</h3>
+<ol>
+<li>核心文字只保留一行。</li>
+<li>同一时间只允许一条单行英文文案；禁止两排文字、上下分行、主副标题并列或多处文字同时出现。</li>
+<li>文字颜色只用两色：黑色或白色 + 已确认的具体商品色。</li>
+<li>文字必须真正出现在视频里，不能只靠后期兜底。</li>
+<li>镜间联系 = 元素连续 + 动势连续 + 形态接续。</li>
+<li>流畅感 = 缓动 + 不卡时点 + 镜头进出有接缝。</li>
+<li>总体节奏按用户选择时长控制。</li>
+<li>文字动效必须可见：前半先淡入或轻微滑入，后半随后淡入或轻微滑入；后半出现时，前半在同一行内轻微位移让位。禁止把文字做成完全静态，也禁止上下分行。</li>
+<li>风格已确定时，表格必须严格遵循该风格。</li>
+</ol>
+<p>用户确认分镜表后，再进入视频生成。</p>
+<h2>步骤 8：视频生成</h2>
+<p>根据已确认的三张独立锚定照片 + 精确节拍文字分镜表直接生成视频。视频风格、背景、光线、气质、节奏都跟随用户已选风格。视频比例和尺寸必须严格跟随用户已选参数，例如用户选择 16:9 就必须生成 16:9，不得自动改成其他比例。</p>
+<p>视频参考规则：</p>
+<ul>
+<li>生视频阶段不要把用户上传的原商品图传给视频模型。</li>
+<li>原商品图只用于前置产品分析和锚定图生成。</li>
+<li>使用三张独立锚定照片保持产品一致性、主视角、材质 / 功能细节、结尾构图和文字版式。</li>
+<li>创意控制来自精确节拍分镜表：镜头顺序、动作、文字、动效、衔接和转场。</li>
+<li>锚定照片只是商品锚定，用于防止产品身份、颜色、材质和版式出错；绝不能把锚定照片当成分镜本身，也不能把三张照片按顺序直接拍成三段视频。</li>
+<li>视频输出必须是单一全画幅连续广告片，禁止出现四宫格、分屏、拼贴、画框、分镜板、网格布局或任何把锚定图布局拍进视频的画面。这个限制对结尾尤其重要：结尾不得回到网格、分镜板、小窗合集或产品格子墙。</li>
+<li>默认生成一条 H3 全画幅产品片，而不是逐镜生成多个首帧视频，除非用户明确要求其他构造方式。</li>
+<li>视频阶段默认开启 MiniMax-H3 原生音频，除非用户明确要求其他模型或无声。音乐提示词使用 Apple 风科技配乐方向，让画面节奏和声音一起生成。</li>
+</ul>
+<p>视频提示词必须包含：</p>
+<ul>
+<li>三张独立锚定照片及每张照片的角色。</li>
+<li>精确节拍分镜表完整内容；必须逐镜读完并逐镜转写，不得只提炼前几镜或漏掉后续文字、多款式、结尾收束要求。</li>
+<li>文案原文。视频生成 prompt 必须逐字写出每一句画面英文文案、出现时间段、前半 / 后半进入时间、颜色和单行行为；不能只依赖分镜表，也不能概括成“文字卡点”或“给文案留白”。</li>
+<li>prompt 完整性检查：如果最终视频生成 prompt 里没有逐字包含所有计划出现的英文文案，本次任务还不能派发，必须先重写 prompt。</li>
+<li>单行文字硬约束：同一时间画面里只允许一条单行英文文案，禁止上下两排、双行标题、主副标题并列或多处文字同时出现；如果文字容易出错，减少文字次数，不要每个镜头都有文字。</li>
+<li>两段式文字动效规则：前半和后半必须在同一行内接续或替换，不能上下分行；动效必须可见，前半先淡入或轻微滑入，后半随后淡入或轻微滑入，后半出现时前半在同一行内轻微位移让位，禁止把文字做成完全静态。</li>
+<li>镜间连贯硬约束。</li>
+<li>MiniMax-H3 原生音频开关和音乐提示词；默认开启原生音频，除非用户明确要求无声或其他模型。</li>
+<li>禁止传原商品图。</li>
+</ul>
+<h2>步骤 9：music-2.6 科技配乐</h2>
+<p>视频生成阶段默认先使用 MiniMax-H3 原生音频，并把下面的 Apple 风科技配乐方向写入视频提示词。如果 H3 直出的音乐不好听、太吵、太弱、不同步，或用户要求重新配乐，再使用 <code>music-2.6</code> 生成一条较长的独立器乐配乐并替换视频音轨。不要默认使用 ElevenLabs；只有用户明确要求严格目标时长时才考虑 ElevenLabs，并按费用确认规则执行。</p>
+<p>默认音乐方向：</p>
+<pre><code class="language-text">100BPM左右，科技感快节奏，柱式和弦，pluck和空气底噪，kick + sub-bass + sine sweep，木质 percussion，瞬间切断，0.5s 内全停，只剩 pluck 尾音衰减。
+</code></pre>
+<p>扩展理解：</p>
+<ul>
+<li>科技感、Apple 风、产品发布感。</li>
+<li>节奏要有推动力，但不能廉价电子舞曲。</li>
+<li>pluck 要清脆、悦耳、靠前，空气底噪要高级。</li>
+<li>kick 和 sub-bass 服务卡点，不要轰头。</li>
+<li>木质 percussion 提供质感，不要变成复杂鼓循环。</li>
+<li>无人声、不要复古合成器风、不要游戏感、不要廉价企业宣传片音乐。</li>
+</ul>
+<h2>步骤 10：音乐分析、卡点剪辑与交付验证</h2>
+<p>最终成片前，必须根据音乐重新剪辑或合成，而不是简单把音乐铺上去。</p>
+<p>音乐分析：</p>
+<ul>
+<li>检测节奏、强拍、能量段和明显单音卡点。</li>
+<li>找出连续有声、能量合适、适合产品展示的 8-12 秒片段。</li>
+<li>不要盲目裁前 10 秒。</li>
+<li>优先选择有明确进入点、后半段不静音、不塌陷、适合结尾稳定停留的片段。</li>
+</ul>
+<p>合成音轨规则：</p>
+<ul>
+<li>保留视频画面，裁音乐连续有声片段，替换视频音轨。</li>
+<li>原视频音轨静音，只保留新音乐。</li>
+<li>音量必须克制，不做响度最大化、不做夸张限制器、不把音乐分贝拉得太大；但也不要压得过低，pluck、节奏点和产品展示需要清楚可听。</li>
+<li>不做过长淡出；只在必要时做 0.1-0.3 秒轻微尾部淡出。</li>
+<li>合成后必须检测音频是否有长静音或听感掉音。</li>
+</ul>
+<p>交付前验证：</p>
+<ul>
+<li>视频比例、时长和语言符合简报。</li>
+<li>商品外观、主推款和多款式出现方式符合锚定图与分镜表。</li>
+<li>文案可读、单行、不拥挤，没有多余箭头或符号；同一时间没有两排文字、上下分行、主副标题并列或多处文字同时出现。</li>
+<li>结尾有稳定的产品与文案收束。</li>
+<li>音乐不吵，也不压得过低。</li>
+<li>输出已在画布上，多资产输出已编组。</li>
+</ul>
+<p>交付内容：</p>
+<ul>
+<li>最终视频路径或画布输出。</li>
+<li>时长、比例和语言。</li>
+<li>简短创意总结。</li>
+<li>使用的文案和音乐片段。</li>
+<li>是否做了卡点剪辑。</li>
+<li>下一轮可改进建议，例如节奏、文案、主推款、音频或平台裁切。</li>
+</ul>
+<h2>失败处理</h2>
+<ul>
+<li>产品图太弱：暂停，给重拍建议，等待更好的产品图。</li>
+<li>文案太长：压缩到 3-5 词英文，并让用户确认。</li>
+<li>文字锚点错误：先重做文字锚点，不要直接进入视频。</li>
+<li>锚定图无法保真产品：加强产品保真要求后重生成。</li>
+<li>分镜套模板：回到精确节拍表，基于产品形态和叙事脊柱重写。</li>
+<li>视频中没有文案：重跑视频提示词，明确文案必须至少出现在中段和结尾。</li>
+<li>视频文字变形：重做文字锚点或把文字镜退化为锚定图的轻微动效。</li>
+<li>比例错误：立即重跑，明确使用用户选择比例。</li>
+<li>音乐太差：优先用 <code>music-2.6</code> 重试，不强控时长，从长音乐里剪好片段。</li>
+<li>合成后后半段没声音：重新分析音乐，选择连续有声片段，用直接替换音轨方式重做。</li>
+</ul>
+<h2>触发示例</h2>
+<p>适合触发本 Skill 的请求：</p>
+<ul>
+<li>“帮我的产品做一个苹果味儿广告片”</li>
+<li>“用这张产品图做 Apple 风电商广告”</li>
+<li>“做一个极简高级的产品发布视频”</li>
+<li>“Make an Apple-style product ad from this product photo”</li>
+<li>“Create a premium minimalist ecommerce product film”</li>
+</ul>
+<p>不要把本 Skill 用于普通视频剪辑、纪录片 / 科普、KOC 口播广告或复杂屏幕文字演示，除非用户明确要的是 Apple 风产品广告流程。</p>
+</div>
+</section>
+<section class="skill-card" id="skill-6">
+
+<div class="skill-head" style="background:linear-gradient(120deg,#7c3aed,#2563eb)">
+  <h2><span class="badge">SKILL 06</span>音乐美学MV<span class="words">约 5754 字</span></h2>
+  <div class="skill-desc">面向音乐人、视频创作者和社交媒体剪辑者，用于制作带歌词贴字的 AI MV 或情绪短片。用户提供音乐、歌词、参考图、角色、字体方向、情绪意图或发布平台。Skill 会分析节拍与人声时序，区分人物、场景和文字参考，设计随节奏变化的空间字幕，拆解长视频为可衔接镜头，审查提示词并路由 H3 等视频生成工具。最终输出 MV 概念、分镜提示词、歌词文字方案和拼接建议。适用于风格化音乐视觉和动态字幕 MV，不适用于普通字幕校对、照搬已有 IP 或完全手工后期剪辑。</div>
+  <div class="skill-meta"><b>name:</b> <code>music-video-subtitle-generator</code><span><b>触发词:</b></span><span class="pill">MV</span><span class="pill">music video</span><span class="pill">lyric typography</span><span class="pill">on-screen text</span><span class="pill">prompt audit</span><span class="pill">Trap MV</span><span class="pill">Gospel hip-hop</span><span class="pill">Dark-pop</span><span class="pill">Cyber-grunge</span><span class="pill">MV提示词</span><span class="pill">歌词文字</span><span class="pill">字幕MV</span><span class="pill">贴字MV</span><span class="pill">卡点MV</span><span class="pill">多镜头拼接</span></div>
+</div>
+<div class="skill-body">
+<h1>音乐美学MV</h1>
+<h2>用途</h2>
+<p>当用户需要创建、修改、审查或生成音乐视频提示词、情绪短片提示词时使用本 Skill，尤其是音乐、歌词、贴字、参考图、节奏、人物表演和镜头语言需要统一设计的任务。本 Skill 将第三方 MV prompt 规则适配为 Hub 可执行流程：关键创意决策需要确认，锁定 prompt 写入画布文本节点，媒体生成交给对应 Hub agent。</p>
+<p>不要用于普通字幕烧录、普通视频剪辑、非音乐类产品广告，或没有 MV 结构需求的单张图片 / 单段视频简单任务。</p>
+<h2>Hub 兼容规则</h2>
+<ul>
+<li>不假设可直接调用第三方工具、shell 脚本、浏览器插件或外部生成 API。</li>
+<li>锁定 prompt 和修订版本必须写入 Hub 画布文本节点。</li>
+<li>角色卡、场景卡、文字卡、视频片段、BGM 和最终合成都交给 Hub 图片、视频、音乐、剪辑 agent。</li>
+<li>不硬编码输出路径，始终使用工具返回的 Hub 文件路径。</li>
+<li>用户说“跳过确认 / 直接做”时，只对本次运行生效，除非外层编排器已将其作为当前会话授权处理。</li>
+<li>如果用户只要 prompt，交付 prompt 后停止；如果用户要完整 MV，在确认后继续生成和合成。</li>
+</ul>
+<h2>核心原则</h2>
+<ol>
+<li>先理解作品，再选择结构。模板是组织工具，不是必须填满的表格。</li>
+<li>使用用户最新确认的创意意图。</li>
+<li>无关字段直接省略，不填空占位。</li>
+<li>不因为预设里有表演、文字、转场、运镜或角色行为，就机械添加到不适合的作品里。</li>
+<li>屏幕文字是设计图层，不是普通字幕；除非用户明确要求普通字幕。</li>
+<li>如果用户上传真实歌曲或 beat，它就是主音乐床，除非用户要求替换。</li>
+<li><strong>多镜头自然衔接原则（针对 &gt;15s 视频）</strong>：当视频时长超过模型单次生成上限（如 15 秒）时，必须采用“多镜头分镜拆解 + 首尾帧接续 + 鼓点硬切 + 全局主音轨对齐”的标准拼接工作流。所有分段镜头必须保持同一音乐 Groove、速度感、画幅、角色逻辑、视觉预设、光影美学和文字运动规则，确保人声、音乐、节奏、画风与场景自然无缝过渡。</li>
+<li>当用户要完整音乐美学 MV 但没有提供歌词时，先生成并锁定原创歌词。最终 MV 必须同时参考人物卡、文字包装卡和场景卡生成。文字包装卡只控制文字包装样式、字体质感、图形设计、排版比例和动效语言。</li>
+</ol>
+<h2>STEP 1：前期锁定</h2>
+<p>写最终生产 prompt 前，先确认最小基础。用简洁选项给出推荐。</p>
+<h3>1.1 视频格式</h3>
+<p>提供固定选项：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">使用场景</th>
+<th style="text-align: right;">画幅</th>
+<th style="text-align: right;">分辨率</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">TikTok / Reels / Shorts 竖屏</td>
+<td style="text-align: right;">9:16</td>
+<td style="text-align: right;">1080×1920</td>
+</tr>
+<tr>
+<td style="text-align: left;">YouTube / B站 横屏</td>
+<td style="text-align: right;">16:9</td>
+<td style="text-align: right;">1920×1080</td>
+</tr>
+<tr>
+<td style="text-align: left;">信息流方图 / Feed</td>
+<td style="text-align: right;">1:1</td>
+<td style="text-align: right;">1080×1080</td>
+</tr>
+<tr>
+<td style="text-align: left;">投流竖屏高密度</td>
+<td style="text-align: right;">9:16</td>
+<td style="text-align: right;">720×1280</td>
+</tr>
+<tr>
+<td style="text-align: left;">电影感宽银幕 MV</td>
+<td style="text-align: right;">21:9</td>
+<td style="text-align: right;">2560×1080</td>
+</tr>
+</tbody>
+</table>
+<p>所选比例必须贯穿角色卡、场景卡、文字参考、shot prompt、视频片段和最终合成。</p>
+<h3>1.2 目标时长与多镜头拆解架构</h3>
+<p>写 prompt 或生成视频前，必须先确认目标 MV 时长。即使用户没有上传音乐或歌词，也不能静默使用模型默认时长来替代用户意图。</p>
+<p>提供简洁时长选项卡：</p>
+<ol>
+<li><strong>10 秒测试版</strong>：单镜头/双镜头，最快验证人物、场景、文字和音频风格。</li>
+<li><strong>15 秒 hook 版</strong>：2~4 个短镜头组，更完整的副歌 / hook / performance 短句。</li>
+<li><strong>30 秒及以上完整 MV 版（多镜头拼接合成）</strong>：由于模型存在 15 秒单次生成上限，系统将自动采用 <strong>“多分镜（Multi-Shot）拼接工作流”</strong>。先生成或锁定一首完整连续歌曲 / BGM，将 30 秒拆解为 4~8 个 2~5 秒的动态分镜头，通过卡拍（Beat-Sync）与首尾帧/场景连续性控制，拼接合成为无缝 MV。</li>
+<li><strong>自定义时长</strong>：用户输入目标时长；根据所选视频模型的单次生成上限（如 15 秒）规划多镜头分镜数量与拼接方案。</li>
+</ol>
+<p>如果用户提供了上传音乐，确认的目标时长就是需要锁定的音乐窗口长度。</p>
+<h3>1.3 音乐窗口</h3>
+<p>如果上传或指定的音乐长于已确认目标时长，必须先锁定片段再写 prompt。</p>
+<p>提供三种模式：</p>
+<ol>
+<li>推荐窗口：assistant 判断最强副歌 / hook / 情绪转折，并请求确认。</li>
+<li>用户时间戳：用户给出开始和结束秒数；检查时间落在音频内。</li>
+<li>多变体：只用于投流钩子测试或多创意方向。</li>
+</ol>
+<p>如果音乐短于目标时长，使用完整音频。除非用户明确要求，不拉伸、不补长。</p>
+<h3>1.3.0 歌词锁定与歌词先行补全</h3>
+<p>写最终视频 prompt 或生成视频前，必须先确定歌词归属：</p>
+<ol>
+<li>如果用户提供了歌词，这份歌词就是锁定歌词。除非用户明确要求改词，否则不得再生成、添加、改写、扩写、翻译、转述或替换成其他歌词。</li>
+<li>如果用户想要完整音乐美学 MV 但没有提供歌词，才生成与所选音乐风格、vocal 模式、目标时长、情绪温度和视觉预设匹配的短篇原创歌词，并将其锁定。</li>
+<li>锁定歌词是人物说唱 / 演唱表演和可见文字包装内容的唯一源文本。</li>
+<li>从锁定歌词拆出每个分镜头的 <code>Rap line:</code>、<code>Vocal line:</code>、<code>Soft vocal line:</code> 或 <code>Spoken line:</code>。</li>
+<li>每个 <code>Typography:</code> 字段也必须来自同一份锁定歌词。有人声表演时，文字必须逐字匹配正在表演的词。</li>
+<li>在最终贴字 MV 中，人物必须根据锁定歌词说唱 / 演唱：可见嘴型、下颌动作、呼吸、面部重音、点头和手势重音都应跟随歌词 phrasing 和 rhythm。</li>
+</ol>
+<h3>1.3.1 大于 15 秒视频的多镜头拼接默认流程</h3>
+<p>对于 &gt;15 秒的 MV（如 30 秒），必须以“全局多镜头分镜 Prompt 脚本”作为权威生成来源：</p>
+<ol>
+<li><strong>锁定完整 Master 音频</strong>：先锁定一首完整连续的歌曲/BGM轨（包含完整的 Vocal 与 Groove），作为整个拼接流程的唯一音频基准。</li>
+<li><strong>构建多分镜时间轴（Shotlist Timeline）</strong>：将 30 秒拆解为 4~8 个短镜头（每个镜头 2~5 秒），精确映射到歌词时间戳与鼓点（Snare/808/Drop）上。</li>
+<li><strong>首尾帧与场景接续控制</strong>：
+   - 若镜头 A 与镜头 B 为同一场景的长镜头延续：将镜头 A 的最后一帧（Tail Frame）作为镜头 B 的起始首帧（Head Frame）输入模型生成。
+   - 若镜头 A 与镜头 B 为硬切换景：保持相同的人物卡/服装/光影美学 Prompt，并使用同向运镜或视觉元素匹配切（Match Cut）。</li>
+<li><strong>生成与剪辑组装</strong>：视频 agent 按 Shotlist 生成各短片段，剪辑 agent 在全局 Master 音轨上根据拍子（Beat Grid）进行裁切、调速（Speed Ramping）与拼接，确保人声口型、鼓点卡拍与画面过渡完全自然。</li>
+</ol>
+<h2>STEP 2：Creative Contract</h2>
+<p>最终 prompt 前先建立简洁创意合约：</p>
+<ul>
+<li>音乐类型、器乐、速度感（BPM）、vocal 模式、情绪温度。</li>
+<li>歌词来源（锁定歌词）。</li>
+<li>目标时长与多镜头拆解结构（例如：30s 拆分为 6 个 Short Shots）。</li>
+<li>参考图角色分工：人物卡、场景卡、文字包装卡。</li>
+<li>运镜、景别、对焦、剪辑卡拍密度与转场衔接逻辑。</li>
+<li>明确排除项（如：严禁淡入淡出、严禁油亮 AI 美颜脸、严禁单镜头硬撑导致变形）。</li>
+</ul>
+<h2>STEP 3：参考图分工与场景采样</h2>
+<p>每张参考图只分配一个窄任务：</p>
+<ul>
+<li><strong>文字参考卡</strong>：只控制文字包装样式、字体质感、图形设计、排版比例和动效语言。严禁出现人物或场景。</li>
+<li><strong>人物参考卡</strong>：只控制人物形象、脸部气质、发型、服装轮廓、角色比例、姿态和整体气场。</li>
+<li><strong>场景参考卡</strong>：只控制场景视觉风格、空间氛围、影像质感、背景层次和光影气质。</li>
+</ul>
+<h3>3.1 近景场景切换与多镜头采样规则</h3>
+<p>对于 Trap、Dark-pop、Cyber-grunge 等快节奏 MV，全片应在多个近景场景之间快速切换：</p>
+<ul>
+<li>场景气质保持统一，但每个镜头的空间必须明显不同（局部背景、隧道、墙面、灯带、反光地面）。</li>
+<li>场景切换必须由明确音乐冲击触发：bass hit、808 drop、snare、vocal 重音或文字砸屏。</li>
+<li>镜头切换是 trap beat 上的“视觉采样”：硬切、跳切、扫描 glitch 硬切、闪切、动作匹配切。</li>
+</ul>
+<h2>STEP 4：预设语法（以 Dark-pop / Cyber-grunge &amp; Trap 为例）</h2>
+<h3>视觉与剪辑语言</h3>
+<ul>
+<li>写实高时装质感、胶片杂志质感（90年代末-00年代初独立杂志/复印纸/胶片扫描/zine拼贴）。</li>
+<li>粗颗粒、轻微胶片抖动、半色调网点、印刷毛边、扫描错位。</li>
+<li><strong>剪辑绝对只使用硬切（Hard Cut）</strong>，严禁淡入淡出、溶解或柔和转场。</li>
+<li>画面与文字强响应鼓点：hi-hat roll（微震/跳帧）、snare（放大/硬切/肩膀下压）、808 bass hit（低频压屏/拉伸/错位）。</li>
+</ul>
+<h3>文字包装规则</h3>
+<ul>
+<li>文字是空间中的动态图形主体（不是普通字幕条），可以处于前景、中景、背景或被人物肩膀/手部遮挡。</li>
+<li>文字绝不遮挡眼睛或主要面部表情；对嘴时避免遮挡嘴部。</li>
+<li>有人声时，显示文字必须逐字匹配正在表演的歌词。每个镜头只出现一个主文字事件。</li>
+</ul>
+<h2>STEP 5：Prompt 结构模板</h2>
+<p>多镜头分镜脚本必须按镜头（Shot）进行模块化输出，每个 Shot 标注准确的时长与音频映射：</p>
+<pre><code class="language-text">[Global Aesthetic &amp; Character Lock]: (全局人物与美学锚点 Prompt)
+
+Shot 1 (0.0s - 3.5s)
+Vocal Line: &quot;...&quot;
+Typography: &quot;...&quot;
+Visual &amp; Action: ...
+Camera &amp; Motion: ...
+Transition Out: Bass-hit 上硬切至 Shot 2 / 同向甩镜
+
+Shot 2 (3.5s - 7.0s)
+Vocal Line: &quot;...&quot;
+Typography: &quot;...&quot;
+Visual &amp; Action: ...
+Camera &amp; Motion: ...
+Transition Out: ...
+</code></pre>
+<h2>STEP 6：BGM 连续性与多镜头自然衔接系统</h2>
+<h3>6.1 音频全局连续性</h3>
+<p>全片必须强绑定同一轨 Master Audio（完整歌曲/Beat）。在分段生成视频时，严禁使用独立、断裂的片段音轨。所有视频片段在剪辑合成阶段均对齐至 Master Audio 的对应时间戳（Timeline）。</p>
+<h3>6.2 多镜头自然衔接系统（Natural Stitching Protocol）</h3>
+<p>为保证 &gt;15 秒视频拼接后的极其自然，必须在 Prompt 规划与后期合成中严格执行以下“五大衔接锁”：</p>
+<p><strong>人声与口型衔接锁（Vocal &amp; Lip Continuity）</strong>：
+分镜切替点（Cut Point）必须落在歌词的句间停顿（Pause/Breath）或强鼓点（Snare/Drop）上。严禁在人物发出某个元音或唱词中途进行硬切，除非后一个镜头是极近特写且口型完全接续。</p>
+<p><strong>音乐与节奏衔接锁（Rhythm &amp; Beat Matching）</strong>：
+剪辑点必须精准裁切在音乐的 1/4 或 1/8 拍（Beat Grid）上。利用画面动作的“加速/减速（Speed Ramping）”微调，使视频中人物的头点拍、手势或眨眼精准踩在鼓点上。</p>
+<p><strong>画面美学与色彩衔接锁（Aesthetic &amp; Color Grading）</strong>：
+跨镜头生成必须携带相同的 Aesthetic Header Prompt（相同的胶片颗粒度、色调 LUT、光影方向）。最终合成时，全局叠加一层 35mm Film Grain Overlay 和统一调色 LUT，掩盖跨批次生成的微小色差。</p>
+<p><strong>空间与转场衔接锁（Transition &amp; Motion Continuity）</strong>：
+长镜头延伸：使用上一镜头的末帧（Tail Frame）作为下一镜头的首帧（Head Frame）输入，Prompt 加上 continuation of action。镜头切换：采用动能延续转场（如 Shot 1 结尾向右快速 Pan，Shot 2 开头从左向右 Pan 入；或利用人物手势遮挡镜头完成 Match Cut）。</p>
+<p><strong>文字动态衔接锁（Typography Motion Stitching）</strong>：
+跨镜头的文字动效，前一镜头的文字在切替瞬间跟随 Bass Hit 执行“破碎/扫出/砸屏”，下一镜头的文字在重音上“砸入/展开”，形成视觉动能的连贯传递。</p>
+<h2>STEP 7：审查清单（Checklist）</h2>
+<p>交付前静默检查：</p>
+<ul>
+<li>[ ] 目标时长超过 15 秒时，是否已自动采用多镜头（Multi-Shot）拆解结构？</li>
+<li>[ ] 是否已锁定唯一的全局 Master Audio，且分镜切替点对齐到了音乐拍子上？</li>
+<li>[ ] 镜头切替是否避开了人声唱词中途，口型与呼吸是否自然？</li>
+<li>[ ] 相邻镜头之间是否有明确的转场衔接机制（首尾帧接续 / 同向运镜 / Match Cut / 鼓点硬切）？</li>
+<li>[ ] 剪辑风格是否严格保持“纯硬切”，绝无淡入淡出或柔和转场？</li>
+<li>[ ] 三张参考卡（人物/场景/文字）是否角色隔离，且未互相污染？</li>
+<li>[ ] 文字包装是否作为空间图层，且绝未遮挡眼睛和主要面部表情？</li>
+<li>[ ] 全局画质、颗粒感、色彩与光影是否保持高度一致？</li>
+</ul>
+<h2>STEP 8：画布交付</h2>
+<p>完整 MV Prompt 脚本锁定后，必须写入专用画布文本节点，命名为 <code>Complete MV Prompt</code> 或 <code>完整MV Prompt</code>。节点内容必须是完整的多分镜 Prompt 脚本与衔接说明，后续修改时更新该节点。</p>
+<h2>STEP 9：最终 MV 生成与合成流程</h2>
+<ol>
+<li><strong>Prompt 锁死与画布写入</strong>：确认完整的多镜头 Prompt 脚本（包含时间戳、歌词映射、转场逻辑）已写入画布。</li>
+<li><strong>分镜素材并行生成</strong>：视频 Agent 根据 Shotlist 逐个生成 2~5 秒的短片段。需要长镜头接续的片段，提取上一片段末帧作为首帧图生视频（I2V）。</li>
+<li><strong>多轨剪辑与自然缝合（Editing &amp; Stitching）</strong>：剪辑 Agent 导入全局 Master Audio 轨，将生成的各 Shot 视频按时间戳对齐上轨，在鼓点（Beat Grid）上进行精细剪辑与速度曲线微调（Speed Ramping），确保人声口型与画面动作完美卡拍。检查镜头接缝处，应用同向运镜或闪切遮瑕。</li>
+<li><strong>全局调色与质感统一（Finishing）</strong>：全局叠加统一的 Movie LUT 与 35mm 胶片颗粒 Overlay，消除 AI 塑料感并锁定画风一致性。</li>
+<li><strong>输出交付</strong>：输出无缝衔接的完整 MV 视频文件。</li>
+</ol>
+</div>
+</section>
+<section class="skill-card" id="skill-7">
+
+<div class="skill-head" style="background:linear-gradient(120deg,#16a34a,#0891b2)">
+  <h2><span class="badge">SKILL 07</span>纸拼贴讲解动画生成器<span class="words">约 6434 字</span></h2>
+  <div class="skill-desc">面向内容创作者、教育讲解者和社交视频编辑，用触感纸拼贴语言表现口播句、知识点、观点或抽象主题。用户提供短文案、故事节点或核心概念，也可补充画幅、时长、色调和音频需求。Skill 会提炼含义与视觉隐喻，制定制作方案和分镜，生成并确认半调纸拼贴静帧，再制作带纸片滑入、弹入、轻敲、压平和摩擦声的停格动画片段，并可按需合成完整讲解视频。默认保留拼贴音效，不主动添加 BGM、旁白和字幕。适合知识讲解、观点表达、故事配画和社交 B-roll，不适合真人口播广告、精确可编辑图层、复杂文字排版或仅输出提示词。</div>
+  <div class="skill-meta"><b>name:</b> <code>paper-collage-explainer-generator</code><span><b>触发词:</b></span><span class="pill">paper collage explainer</span><span class="pill">paper-collage animation</span><span class="pill">halftone collage</span><span class="pill">collage explainer</span><span class="pill">纸拼贴</span><span class="pill">拼贴科普</span><span class="pill">定格拼贴</span><span class="pill">拼贴动画</span></div>
+</div>
+<div class="skill-body">
+<h1>纸拼贴讲解动画生成器</h1>
+<p>将一句口播、一个故事主题、观点句或抽象概念，转化为统一的编辑感纸拼贴动画序列。视觉语言是高级半调纸拼贴：大色块纸面、黑白半调照片剪影、选择性彩色卡纸点缀、暖白描边、柔和纸影、触感定格组装，以及清晰的拼贴音效。</p>
+<p>这个 Skill 使用 Hub 原生图像、视频、音频和可选后期能力。它优先保证风格连续、色彩统一、纸张质感可控、定格拼贴节奏清楚，并采用新的音频策略：默认保留或生成触感拼贴音效，但明确默认不添加 BGM、旁白口播和字幕，除非用户要求。</p>
+<h2>适用场景</h2>
+<p>当用户需要以下内容时使用：</p>
+<ul>
+<li>把一句脚本或观点转成视觉隐喻拼贴动画</li>
+<li>用拼贴 B-roll 解释简单故事、文学主题或知识点</li>
+<li>为口播或社交视频制作编辑感纸拼贴动画</li>
+<li>制作从空色纸背景中逐步组装物件的半调拼贴动画</li>
+<li>把多条抽象句子或故事节点批量转为独立视觉隐喻动画</li>
+<li>制作带纸片滑动、弹入、压平、轻响和摩擦声的触感知识短片，但不默认加音乐或口播</li>
+</ul>
+<p>不适用于：</p>
+<ul>
+<li>写实产品广告或真人出镜口播视频</li>
+<li>精确可编辑图层、时间线关键帧或透明切片素材</li>
+<li>精确 Logo 位置或可读长文字排版</li>
+<li>只需要视频提示词、不需要生成媒体</li>
+</ul>
+<h2>默认创作目标</h2>
+<p>除非用户另有说明：</p>
+<ul>
+<li>输出画幅：16:9 横版</li>
+<li>单段时长：每段约 4 秒</li>
+<li>默认音频：保留或生成触感纸拼贴音效，例如纸片滑动、弹入、压平轻敲、轻微摩擦和纸片轻响</li>
+<li>默认不添加 BGM：可以询问用户是否需要 BGM，但只有用户明确要求时才添加音乐</li>
+<li>默认不添加旁白口播：可以询问用户是否需要旁白讲解/口播，但只有用户明确要求时才写稿、配音或加入人声</li>
+<li>默认不添加字幕：可以询问用户是否需要字幕，但只有用户明确要求时才生成或烧录字幕</li>
+<li>视觉风格：高级编辑感半调纸拼贴</li>
+<li>运动风格：触感停格组装，不使用慢速缩放、泛泛漂浮或平滑数字图层移动</li>
+<li>默认视频生成模型：<code>MiniMax-H3</code>，除非用户明确指定其他模型、该模型不可用，或硬性能力要求排除它</li>
+<li>图像/视频中文字：避免可读字母、数字、UI、字幕、水印和 Logo</li>
+<li>图像质量与层次：优先生成好看的 16:9 层次构图，前景/中景/背景清楚，主体层级强，画面丰富但易读，留白可控</li>
+</ul>
+<h2>音频策略</h2>
+<p>这个 Skill 的默认交付是：<strong>带拼贴音效，默认不添加 BGM、旁白口播和字幕</strong>。</p>
+<ol>
+<li>在第一次制作方案确认时，必须明确写出默认媒体方式：保留或生成触感纸拼贴音效；默认不添加 BGM、旁白口播和字幕，除非用户明确要求。</li>
+<li>对科普或讲解类内容，可以询问用户是否需要 <strong>旁白讲解/口播</strong>、<strong>BGM</strong> 或 <strong>字幕</strong>，但必须把它们作为可选增强，而不是默认项。</li>
+<li>不要因为用户要“科普/讲解视频”就自动推断需要人声旁白。若用户没有选择旁白，就写无声视觉叙事节奏，而不是旁白稿。</li>
+<li>不要因为用户要“社交视频”就自动推断需要 BGM 或字幕。若用户没有选择，就只保留拼贴音效。</li>
+<li>生成视频片段时，如果模型支持音频，默认要求同步触感拼贴音效：纸片滑动、弹入、压平轻敲、轻微摩擦和小纸片脆响。</li>
+<li>最终合成时，如果原片段音轨是拼贴音效，默认保留这些原始音轨，不要默认丢弃音频。</li>
+<li>只有当用户要求静音、生成音频中出现不需要的人声/音乐，或用户要求另行混入音乐/旁白时，才移除或替换音频。只有用户明确要求时才生成或烧录字幕。</li>
+</ol>
+<h2>全局风格规则</h2>
+<p>对每张静帧和每段视频应用以下规则：</p>
+<ol>
+<li><strong>统一整体风格。</strong> 每段都应像同一套编辑感纸拼贴系列：半调剪影、大色块、暖白描边、柔和实体纸影、干净构图、触感纸材和协调的拼贴音效。</li>
+<li><strong>控制纸张质感强度。</strong> 纸张不能像完全扁平数字图层，也不能变得过旧、脏、皱或偏棕，除非用户明确要求。优先使用干净精致的手工纸质感：细纤维、轻微不规则撕边、浅层毛边、层叠接缝和软阴影。</li>
+<li><strong>统一色彩基调。</strong> 不要在未经确认时引入与静帧或整体色板冲突的牛皮纸、棕色、发黄或做旧底纸。每段从与已确认静帧主色一致的纸面开始。</li>
+<li><strong>让运动像停格拼贴。</strong> 使用明确纸片动作：逐片出现、滑入或弹入、轻微回弹、压平、暂停，然后锁定最终构图。避免快速旋转、过度翻飞、混乱飞散、全局淡入、平滑数字平移/缩放或泛泛漂浮。</li>
+<li><strong>保持段落协调。</strong> 当前一两段建立了批次风格和音效节奏后，后续片段和修订应参考该节奏与色调，让整支片子像同一系列。</li>
+<li><strong>默认制作精致 16:9 层次场景。</strong> 除非用户明确要求其他平台画幅，默认按 16:9 横版规划和生成。利用宽画幅建立前景/中景/背景层次、丰富环境道具、清晰主体层级和横向构图，不让画面变碎。</li>
+<li><strong>突出纸拼贴工艺。</strong> 每张静帧和每段视频都应让拼贴方法可见：可分离纸片组、半调照片剪影、彩色卡纸点缀、触感阴影、撕边、层叠接缝，以及弹入、滑入、轻微回弹、压平、暂停、锁定等停格动作。</li>
+</ol>
+<h2>STEP 1：解析输入</h2>
+<p>针对每条句子、概念、故事或主题，提炼：</p>
+<ul>
+<li>核心含义：观众应该理解什么</li>
+<li>情绪：平静、紧迫、讽刺、惊奇、荒诞、澄清、反思、神秘或轻快</li>
+<li>动作动词：打开、连接、泄漏、归档、压缩、分裂、照亮、绑定、组装、揭示、坠落、追逐、转化、碰撞</li>
+<li>视觉隐喻：不用屏幕文字也能表达含义的具体画面</li>
+<li>关键物件：3–6 个大而易读的纸片组</li>
+<li>音效含义：该段适合纸片滑动、弹入、压平、轻敲、摩擦还是脆响</li>
+</ul>
+<p>若是故事主题，除非用户指定段落数，否则拆为 3–6 个简洁节点。相似节点可共享设计语言，但每段应有不同隐喻、物件、色场和音效节奏。</p>
+<h2>STEP 2：Gate 1 — 制作方案确认</h2>
+<p>在生成任何媒体前，先创建简洁制作方案文档，并等待用户确认。用户确认前不要生成静帧或视频。</p>
+<p>制作方案必须包含：</p>
+<h3>Brief</h3>
+<ul>
+<li>主题或原始句子</li>
+<li>已知的目标受众/使用场景</li>
+<li>画幅和时长假设</li>
+<li>语气与节奏</li>
+<li>视觉风格摘要</li>
+<li>媒体方案，明确写为：默认保留或生成拼贴音效；默认不添加 BGM、旁白口播和字幕，除非用户明确要求</li>
+<li>可选增强问题：需要时可以询问用户是否要旁白讲解/口播、BGM 或字幕，但必须保持为可选项</li>
+</ul>
+<h3>视觉隐喻</h3>
+<p>每个计划段落包含：</p>
+<ul>
+<li>核心含义</li>
+<li>情绪</li>
+<li>一句话视觉提案</li>
+<li>3–6 个关键物件</li>
+<li>建议背景色和强调色</li>
+<li>预计组装顺序</li>
+<li>预计拼贴音效点，例如滑入、弹入、压平、轻敲、摩擦或脆响</li>
+</ul>
+<h3>脚本 / 视觉节奏轨</h3>
+<p>只有当用户明确要求旁白时，才写简洁旁白稿。若用户没有明确要求旁白，不要写旁白稿；改为写无旁白视觉节奏轨，说明观众将通过画面理解什么。</p>
+<p>如果用户只需要为已有句子制作 B-roll，则保留原句作为上下文，不要发明旁白。</p>
+<h3>分镜</h3>
+<p>每个段落包含：</p>
+<ul>
+<li>段落标题</li>
+<li>最终画面描述</li>
+<li>动效想法</li>
+<li>近似时长</li>
+<li>拼贴音效想法</li>
+<li>风格连续性和色彩协调说明</li>
+</ul>
+<p>展示制作方案后，等待用户批准、否定或修改。如果用户只批准部分编号，只推进已批准部分并修改其余部分。</p>
+<h2>STEP 3：建立静帧规格</h2>
+<p>制作方案确认后，为每个已批准段落写紧凑的视觉规格，规格应能直接用于图像生成。</p>
+<p>包含：</p>
+<ul>
+<li>脚本含义或故事节点</li>
+<li>视觉隐喻</li>
+<li>画幅</li>
+<li>背景色场</li>
+<li>强调色</li>
+<li>关键物件组及作用</li>
+<li>构图、前景/中景/背景层次与留白</li>
+<li>最终画面关系</li>
+<li>风格连续性说明</li>
+<li>该静帧的避免项</li>
+</ul>
+<p>使用以下风格签名：</p>
+<pre><code class="language-text">flat bold color field, black-and-white halftone photographic cut-outs, selective colored cardstock accents, warm cream keylines, soft paper shadows, fine uncoated-paper grain, premium editorial paper collage, clean refined hand-torn paper edges, subtle fibrous edges, layered paper seams
+</code></pre>
+<p>色彩建议：</p>
+<ul>
+<li>焦橙或红色：劳动、时间压力、紧迫感</li>
+<li>芥末黄：工具、警示、累积错误</li>
+<li>墨绿：认知、重置、判断、超现实平静</li>
+<li>深紫：记忆、结构、神秘、梦境逻辑</li>
+<li>青绿：协作、执行、系统流动</li>
+<li>玫红：荒诞、仪式、戏剧张力</li>
+</ul>
+<p>不要把钴蓝作为自动默认色。通过纸张质感、半调处理、描边、阴影、画幅和受控色板统一整批画面。只有当故事节点需要对比时才变化色场。</p>
+<h2>STEP 4：Gate 2 — 生成并确认静帧</h2>
+<p>为每个已批准段落生成一张最终静帧。静帧应看起来像未来动画的完成最后一帧。</p>
+<p>静帧要求：</p>
+<ul>
+<li>使用用户指定画幅；否则默认 16:9 横版</li>
+<li>扁平大色块纸背景，带细微纤维质感</li>
+<li>3–6 个大的可分离物件组，除非已批准分镜确实需要略多</li>
+<li>主体清楚、视觉层级强、留白干净，并有可见前景/中景/背景层次</li>
+<li>以黑白半调照片剪影为主要结构，结合丰富但易读的场景道具支撑故事节点</li>
+<li>仅在强化层级时使用选择性彩色卡纸强调</li>
+<li>暖白描边、柔和实体纸影、精致撕边和轻微层叠纸缝</li>
+<li>不出现可读文字、假字母、数字、字幕、UI、水印或 Logo，除非用户明确要求</li>
+</ul>
+<p>展示生成的静帧，并在视频生成前等待用户确认。如果静帧太忙、色彩不匹配、纸层过多、边缘太数字化或纸张过旧/过棕，应先修订静帧再生成视频。</p>
+<h2>STEP 5：规划停格组装</h2>
+<p>对每张已批准静帧，准备运动方案，并把已批准静帧视为完成最终画面。</p>
+<p>默认运动顺序：</p>
+<ol>
+<li>从与已批准静帧主背景一致的干净纸色场开始，而不是不匹配的牛皮纸或棕色底。</li>
+<li>基础结构作为纸片滑入、弹入或压入。</li>
+<li>角色、卡片、物件或主要隐喻元素入场。</li>
+<li>次要物件逐个组装，带小幅回弹、压平和暂停。</li>
+<li>最终关系锁定到已批准构图。</li>
+<li>结尾短暂停留在完整静帧式画面上。</li>
+</ol>
+<p>运动提示词指导：</p>
+<pre><code class="language-text">Paper-collage stop-motion assembly. Start on a clean paper field matching the approved still's background color and tone. Assemble the scene piece by piece with tactile stop-motion timing: foreground, midground, and background paper groups appear in a readable order; each paper object appears, slides or pops in, lightly bounces, presses flat, pauses, and locks into place. Preserve the halftone dots, cream keylines, subtle fibrous torn edges, layered paper seams, soft shadows, paper grain, color field, and approved aspect ratio. End by holding the completed composition matching the approved still frame. Sound design: tactile collage SFX only, synchronized to paper-piece motion: soft paper slide, pop-in, press-flat tap, light rustle, and tiny paper snap where appropriate. Default: do not add BGM, voiceover, dialogue, or subtitles unless the user explicitly requested them. No mismatched kraft-paper opening, no brown/yellowed base unless approved, no fast spinning, no chaotic object flight, no smooth digital layer movement, no scene cuts, no camera move, no zoom, no morphing, no new objects, no text, no logos, no watermark, no UI.
+</code></pre>
+<h2>STEP 6：生成带拼贴音效的 B-roll 片段</h2>
+<p>Gate 2 确认后，为每张已批准静帧生成一段视频。</p>
+<p>生成要求：</p>
+<ul>
+<li>如果所选 Hub 视频模型支持，使用已批准静帧作为视觉参考/最终帧锚点</li>
+<li>使用与静帧相同的画幅</li>
+<li>除非用户要求其他时长，否则目标约 4 秒</li>
+<li>默认生成或保留触感拼贴音效：纸片滑动、弹入、压平轻敲、轻微摩擦、小纸片脆响</li>
+<li>默认不生成或添加 BGM，除非用户明确要求音乐</li>
+<li>默认不生成或添加人声讲解、口播或主持人音频，除非用户明确要求旁白/口播</li>
+<li>如果生成片段中有可用拼贴音效，后期和最终合成时保留它</li>
+<li>如果生成片段出现不需要的人声、音乐、假 UI 音或嘈杂环境声，根据用户目标移除或重新生成音频</li>
+<li>保持镜头视觉稳定；除非用户要求，不增加运镜</li>
+<li>保持拼贴材质语言、最终构图和已建立批次风格</li>
+<li>修订后续片段时，可参考已通过的最佳前序片段风格和节奏</li>
+</ul>
+<p>默认使用 <code>MiniMax-H3</code> 生成视频。除非 <code>MiniMax-H3</code> 失败、不可用或无法满足硬性能力需求，不要要求用户选择模型。如果用户明确指定其他模型，保留该模型为主并只在必要时调整参数。</p>
+<h2>STEP 7：质量检查</h2>
+<p>按以下标准检查静帧和视频：</p>
+<ul>
+<li>视觉隐喻或故事节点无需屏幕文字也能理解</li>
+<li>静帧默认具有漂亮的 16:9 构图、清晰色场、明确物件层级和前景/中景/背景深度</li>
+<li>物件组数量可读，不是一屏碎片</li>
+<li>片段从与已批准静帧或批次色板一致的色场开始</li>
+<li>组装是逐片可见的，不是整体淡入</li>
+<li>运动像定格拼贴：独立纸片弹入或滑入、轻微回弹、压平、暂停、锁定</li>
+<li>默认保留触感拼贴音效：能听到纸片滑动、弹入、压平、摩擦等声音；除非用户明确要求，不应有 BGM、旁白口播或字幕</li>
+<li>纸张质感可控：不太平、不太旧、不偏棕/牛皮纸，除非已确认</li>
+<li>色调在整批中一致</li>
+<li>最终帧接近已批准静帧</li>
+<li>没有不需要的可读文字、假 UI、字幕、水印或 Logo</li>
+</ul>
+<p>只要隐喻清楚、最终构图仍像已批准静帧，微小细节漂移可以接受。若出现严重漂移、文字、假 UI、开场颜色不匹配、未经允许的牛皮纸底、过脏过皱纸质、丢失停格组装、不需要的 BGM 或不需要的旁白，应根据问题发生阶段重生成或后期处理。</p>
+<h2>STEP 8：可选合成、音乐、旁白与交付</h2>
+<p>如果用户要求多片段故事视频，按确认的分镜顺序合成已批准片段，并默认保留每段原始拼贴音效。</p>
+<p>只有当用户明确要求时才添加 BGM、旁白口播或字幕。若用户在片段已生成后要求 BGM 或旁白，应在保留拼贴音效的基础上混入，除非用户要求静音或替换原音效。</p>
+<p>每个完成项交付：</p>
+<ul>
+<li>最终 B-roll 视频路径或最终合成视频路径</li>
+<li>相关已批准静帧路径</li>
+<li>一句话说明脚本或视觉节点如何转化为视觉隐喻</li>
+<li>媒体说明：默认保留拼贴音效，并列出用户明确要求加入的 BGM、旁白口播或字幕</li>
+<li>若片段有轻微可接受漂移，说明 QA 注意事项</li>
+</ul>
+<p>批量任务按编号组织结果，并保留用户原始句子或故事节点。</p>
+<h2>故障处理</h2>
+<ul>
+<li>如果制作方案默认写成无声视频，应改为“默认带拼贴音效”，除非用户明确要求静音。</li>
+<li>如果制作方案在用户未要求时加入 BGM、旁白口播或字幕，必须移除，并把 BGM、旁白口播和字幕作为可选项询问。</li>
+<li>如果制作方案太直白，回到 Gate 1，把视觉提案改得更物件化。</li>
+<li>如果静帧包含假文字或 UI，先重生成静帧，不要只在视频提示词里修复。</li>
+<li>如果静帧或视频太忙，减少纸层、简化物件数量，恢复留白。</li>
+<li>如果视频缺少组装动作，减少物件数量，并明确逐步到达顺序。</li>
+<li>如果运动像平滑数字图层，围绕停格节拍重写提示：出现 → 轻微回弹 → 压平 → 暂停 → 锁定。</li>
+<li>如果纸张太平，加入轻微撕边、纤维、层叠接缝和软阴影。</li>
+<li>如果纸张过旧或脏，去掉牛皮纸、棕黄底、重皱纹、污渍和做旧处理。</li>
+<li>如果开场颜色与静帧冲突，从与静帧主背景一致的颜色开始。</li>
+<li>如果最终帧偏离静帧太远，加强“已批准静帧是完成最终构图”的指令。</li>
+<li>如果生成音频缺少拼贴音效但画面可用，询问用户保留、重生成更强音效方向，或后期补同步音效。</li>
+<li>如果生成音频出现不需要的 BGM 或旁白，交付前移除或重生成。</li>
+<li>如果用户需要精确图层控制，建议改用分层动画或剪辑工作流，而不是继续本 Skill。</li>
+</ul>
+</div>
+</section>
+<section class="skill-card" id="skill-8">
+
+<div class="skill-head" style="background:linear-gradient(120deg,#c026d3,#7c3aed)">
+  <h2><span class="badge">SKILL 08</span>纸艺定格科普视频生成器<span class="words">约 6554 字</span></h2>
+  <div class="skill-desc">面向希望用手工纸艺视觉讲解科学、教育或泛知识内容的创作者。用户需提供主题、核心知识点或原始材料，并可指定受众、时长、画幅和交付类型。Skill 会先提炼学习目标与视觉隐喻，提出创意方向，设计纸偶角色、分层纸雕布景和道具资产，制作预览概念、图像与视频提示词，规划分镜、运镜、转场和声音，并通过阶段确认与审核清单控制质量。最终输出可直接进入制作的纸艺定格科普视频创作包，也可按需交付单图、系列图、短视频提示词或分镜。适用于纸雕、剪纸、立体书和微缩定格讲解，不适用于普通二维卡通、线稿涂鸦、真人写实视频或无纸艺质感的标准科普。</div>
+  <div class="skill-meta"><b>name:</b> <code>papercraft-stop-motion-explainer</code></div>
+</div>
+<div class="skill-body">
+<h1>纸艺定格科普视频生成器</h1>
+<p>将科学、教育或知识主题整理成完整的纸艺定格动画科普创作包。产出应包含画风规则、角色与场景设计、资产规划、提示词、分镜结构、动效语言、声音方向、反向提示词和审核标准。</p>
+<p>适用于用户想要触感强、手作感强的科普视觉：分层纸片、卡纸剪裁、微缩纸雕布景、纸偶定格动作、立体书式展开、纸质道具和真实层间投影。默认假设用户想得到一个完整的科普视频创作包。提示词、分镜、资产规划和动效说明都是完整流程中的可审核生产资产，不是孤立交付物，除非用户明确只要某一项。</p>
+<p>当本 Skill 从方案/提示词推进到实际视频生成时，默认使用 MiniMax-H3 作为视频生成模型。除非用户明确选择其他可用模型，或 MiniMax-H3 当前不可用，否则都按 MiniMax-H3 执行。</p>
+<h2>画布文档交付规则</h2>
+<p>当输出完整视频创作包、制作方案、分镜方案或任何较长的多章节生产文档时，必须把完整方案写入画布文本节点。对话内只给用户简短说明、文档文件名和下一步建议。除非用户明确要求在对话里查看全文，不要把长制作方案、大型分镜表、完整提示词库或完整检查清单直接粘贴到聊天区。</p>
+<p>聊天区用于简洁指引和决策确认；画布文档作为详细制作方案的主交付物。用户要求修改方案时，优先更新已有画布文档，不要重复创建新文档，除非确实需要生成新版本。</p>
+<h2>画面层次与纸艺定格优先级</h2>
+<p>每一次视觉方案、预览图提示词、视频提示词和审核都必须同时强调画面层次与明确的纸艺定格动画质感。</p>
+<p>画面层次必须强调：</p>
+<ul>
+<li>场景要有清晰的前景、中景、背景和远景。</li>
+<li>使用纸片叶子、云纹、门框、帘幕、道具或剪影作为前景遮挡，制造空间深度。</li>
+<li>核心知识对象或主要动作放在易读的中景层。</li>
+<li>背景不能只是静态平面，要加入背景视差、小型环境动效和层间分离。</li>
+<li>需要时使用圆形、斜向、隧道式、立体书式或剖面式构图帮助观众读出层次。</li>
+</ul>
+<p>纸艺定格质感必须强调：</p>
+<ul>
+<li>所有可见物体都应像真实纸材制作：多层卡纸、剪裁边缘、纸纤维、折痕、拼贴缝、标签片、铆钉、关节、拉片、滑轨、转盘和可见厚度。</li>
+<li>动作要像逐帧手工拨动：小幅分段移动、短暂停顿、轻微回弹、铰链动作、滑动纸机关、翻页、拉片揭示和纸片落定。</li>
+<li>背景元素也应尽量是纸艺机关：纸云沿滑轨移动、纸月亮或圆盘沿轨道运动、多层布景视差、纸叶落下、纸灯笼轻晃、纸门打开。</li>
+<li>避免丝滑 CG 动作、塑料 3D 表面、平面矢量背景、过于静止的背景，以及破坏微缩定格感的大幅角色运动。</li>
+</ul>
+<h2>轻量请求旁路规则</h2>
+<p>如果用户明确只需要某一个生产资产，不要强制执行完整 18 步创作包流程。直接进入对应步骤，同时保留纸艺定格动画的核心画风规则。</p>
+<p>使用这些快捷路径：</p>
+<ul>
+<li>只要单图提示词：执行 STEP 1、STEP 2、STEP 9、STEP 17。</li>
+<li>只要系列图提示词：执行 STEP 1、STEP 2、STEP 10、STEP 17。</li>
+<li>只要 5 秒图生视频提示词：执行 STEP 1、STEP 2、STEP 11、STEP 17。</li>
+<li>只要分镜：执行 STEP 1、STEP 2、STEP 12、STEP 13、STEP 14、STEP 15、STEP 16。</li>
+<li>只要创意方向：执行 STEP 1、STEP 2、STEP 3。</li>
+</ul>
+<p>只有当用户要求完整视频创作包、完整制作方案，或没有明确缩小交付范围时，才使用完整阶段确认流程。</p>
+<h2>交互规则：每个阶段之间用选择卡片确认</h2>
+<p>每完成一个关键阶段，都先停下，用选择卡片询问用户是否进入下一步。所有轮询、多选、确认、继续/修改/停止等用户决策点都必须用卡片形式，不要用纯文本让用户回复数字。卡片必须给出具体下一步选项，而不是开放式追问。完成创意方向阶段后，下一张确认卡必须先让用户选择目标视频时长，再继续角色、场景、预览图、提示词或分镜等细化工作。</p>
+<p>常用选项：</p>
+<ol>
+<li>按当前方向继续下一阶段。</li>
+<li>先修改当前阶段再继续。</li>
+<li>切换到另一个创意方向。</li>
+<li>跳到某个具体生产资产：视觉预览图、单图提示词、系列图提示词、5 秒图生视频提示词或分镜。</li>
+<li>到此停止，导出当前创作包。</li>
+</ol>
+<p>卡片要简短；如果当前结果足够稳，推荐选项放在第一项。这个阶段确认机制用于保护完整视频流程，让用户能在每个资产进入下一步前先调整。</p>
+<h2>STEP 1：理解输入需求</h2>
+<p>分析用户的主题和制作目标。保留用户原始领域词，不要把科学主题改写成另一个主题。</p>
+<p>输出简洁的需求理解：</p>
+<ul>
+<li>科普主题或知识点</li>
+<li>目标观众：儿童、泛知识用户、课堂学生、社媒用户、品牌教育或专业观众</li>
+<li>目标时长：15 秒、30 秒、60 秒或未指定</li>
+<li>平台或画幅需求</li>
+<li>交付类型：单图、系列图、5 秒图生视频提示词、分镜或完整制作包</li>
+<li>核心学习目标：观众最后应记住的一句话</li>
+<li>视觉隐喻：这个概念如何变成纸质物体、模型、纸偶、层级、路径或机关</li>
+</ul>
+<p>如果信息缺失，直接选择合理默认：泛知识观众、30 秒短视频、视频默认横屏 16:9，除非用户明确指定其他比例；一个纸艺讲解员加一个核心纸艺模型。</p>
+<h2>STEP 2：总结画风基因</h2>
+<p>在正式设计前，先说明必须保持一致的画风规则。</p>
+<p>包含这些特征：</p>
+<ul>
+<li>手工纸艺定格动画感</li>
+<li>微缩纸雕场景或剧场箱布景</li>
+<li>多层卡纸剪裁，能看到纸片厚度</li>
+<li>哑光、可触摸的纸张纹理、纤维、折痕、缝隙、撕边或剪裁边缘</li>
+<li>纸偶角色由独立纸片部件叠压组装</li>
+<li>层与层之间有真实物理投影</li>
+<li>明确的前景、中景、背景、远景多平面结构</li>
+<li>微距摄影感、轻微景深和 2.5D 视差</li>
+<li>标签、箭头、卡片、图表等教育信息也用纸片制作</li>
+<li>清晰的前景 / 中景 / 背景 / 远景层次，有前景遮挡和可读的视差关系</li>
+<li>背景层也要有纸艺机关动效，而不是静态绘制背景</li>
+<li>定格动画动作语言：分段移动、短暂停顿、轻微回弹、铰链关节、拉片、滑轨、转盘和纸片落定</li>
+</ul>
+<p>说明理由：纸艺媒介能把抽象科学变成可触摸的模型，也天然适合做分层讲解。场景必须像真实搭建并逐帧拍摄出来，而不是只有纸质纹理的普通插画。</p>
+<h2>STEP 3：提出 3-5 个创意方向</h2>
+<p>生成 3 到 5 个不同创意。每个方向都应从不同视觉隐喻或叙事结构解释同一主题。</p>
+<p>每个方向包含：</p>
+<ul>
+<li>创意标题</li>
+<li>核心想法</li>
+<li>讲解角度</li>
+<li>纸艺视觉隐喻</li>
+<li>最适合的时长</li>
+<li>最适合的观众或平台</li>
+<li>标志性画面瞬间</li>
+<li>风险或限制</li>
+</ul>
+<p>展示创意方向后，必须让用户同时选择创意方向和目标视频时长。时长选项保持简洁：15 秒快版、30 秒标准版、60 秒完整版或自定义时长。用户选定时长前，不要继续进入详细资产设计。</p>
+<p>推荐方向类型：</p>
+<ol>
+<li>立体书旅程：每翻开一页揭示概念的一层。</li>
+<li>纸艺科学家实验室：纸偶主持人在实验台上演示机制。</li>
+<li>分层剖面模型：核心对象像剖面图一样打开。</li>
+<li>微缩自然剧场：生态、地理、天文主题在纸雕景观中展开。</li>
+<li>纸片机关板：齿轮、箭头、滑轨、标签和移动纸片解释因果关系。</li>
+</ol>
+<h2>STEP 4：设计纸艺角色</h2>
+<p>只有当角色能帮助讲解时才设计角色。角色可以是主持人、助手、动物向导、拟人化分子、免疫细胞、行星、机器零件或自然力量。</p>
+<p>每个角色输出：</p>
+<ul>
+<li>名称和讲解职责</li>
+<li>造型语言和比例</li>
+<li>纸艺结构：剪纸五官、分层头发或身体、卡纸四肢、关节节点、标签片、铆钉或折叠结构</li>
+<li>表情系统：简单纸片眼睛、眉毛、嘴型、可替换表情卡</li>
+<li>动作方式：定格式小幅移动、铰链手臂、指向、弹跳、滑动或翻卡表情</li>
+<li>系列图一致性所需的可复用身份特征</li>
+</ul>
+<p>角色必须足够简洁，保证短视频里一眼能读懂。</p>
+<h2>STEP 5：设计纸片场景</h2>
+<p>把每个场景当成一个真实纸艺舞台，而不是平面背景。</p>
+<p>每个场景输出：</p>
+<ul>
+<li>场景名称</li>
+<li>科普功能</li>
+<li>前景元素</li>
+<li>中景主体和动作</li>
+<li>背景环境</li>
+<li>远景底板或天空</li>
+<li>可移动纸艺机关</li>
+<li>教育信息承载物：标签、箭头、图表、测量牌、说明卡或标题卡</li>
+</ul>
+<p>尽量使用至少四个空间层。通过间距和投影让核心模型从背景中分离出来。</p>
+<h2>STEP 6：规划分层纸雕布景</h2>
+<p>输出多平面布景表。</p>
+<p>必备列：</p>
+<ul>
+<li>层级编号</li>
+<li>平面作用</li>
+<li>纸艺元素</li>
+<li>材质和边缘处理</li>
+<li>动效或视差行为</li>
+<li>投影关系</li>
+<li>知识表达功能</li>
+</ul>
+<p>规则：</p>
+<ul>
+<li>大多数镜头使用 4-7 层。</li>
+<li>阅读量大的标签放在稳定层。</li>
+<li>前景元素可以局部遮挡画面，增强微缩摄影感。</li>
+<li>核心概念放在注意力最强的中景。</li>
+<li>用分层解释层级、顺序、结构、因果或尺度。</li>
+</ul>
+<h2>STEP 7：规划道具资产库</h2>
+<p>按功能输出资产列表。</p>
+<p>资产分组：</p>
+<ul>
+<li>主持人和角色资产</li>
+<li>核心科学对象资产</li>
+<li>讲解道具：箭头、标签、卡片、图表、放大镜、尺子、仪表</li>
+<li>场景道具：实验台、山丘、书、架子、云、星星、树、水、管道、齿轮</li>
+<li>动效道具：纸条、滑轨、旋转圆盘、立体弹出片、抽拉层、纸屑</li>
+<li>声音提示道具：翻页、剪纸、纸张摩擦、卡扣、弹出、胶带撕拉</li>
+</ul>
+<p>每个资产定义：</p>
+<ul>
+<li>名称</li>
+<li>用途</li>
+<li>纸张材质</li>
+<li>所在层级</li>
+<li>静态或可动</li>
+<li>出现时间</li>
+<li>一致性注意事项</li>
+</ul>
+<h2>STEP 8：规划或生成 1-3 张视觉预览图</h2>
+<p>在撰写最终提示词或分镜之前，先基于已确认的创意方向、角色设计、场景设计和分层布景，规划 1 到 3 张视觉预览图。如果当前环境支持图像生成且用户需要实际预览图，则生成预览图；否则输出预览图说明和提示词。预览图用于确认风格和概念，不是最终生产帧。</p>
+<p>预览图比例默认跟随项目视频比例：视频默认横屏 16:9，除非用户明确指定其他比例。如果用户要求竖屏、方图或其他格式，预览图和后续视频规划都保持该比例一致。</p>
+<p>每张预览图需说明：</p>
+<ul>
+<li>预览图编号和目的</li>
+<li>它对应哪个已确认的创意方向、角色或场景</li>
+<li>视觉重点：整体世界观、角色造型、机关清晰度、文化氛围或结尾记忆点</li>
+<li>用户进入下一步前需要判断什么</li>
+</ul>
+<p>推荐预览组合：</p>
+<ol>
+<li>整体世界预览：展示完整纸艺布景、主角色、核心对象和整体氛围。</li>
+<li>机制预览：展示科学模型、纸箭头、标签和可动讲解道具。</li>
+<li>情绪或结尾预览：展示文化连接、总结卡片或最终记忆画面。</li>
+</ol>
+<p>展示预览图后，必须用选择卡片暂停确认。选项可包括：继续撰写提示词、修改预览图 1、修改预览图 2、修改预览图 3、收敛为单一视觉方向，或切换创意方向。用户确认视觉方向前，不要撰写最终单图提示词、系列图提示词或 5 秒图生视频提示词。</p>
+<h2>STEP 9：撰写单图提示词</h2>
+<p>为概念图或主视觉写一条提示词。</p>
+<p>提示词必须包含：</p>
+<ul>
+<li>用户主题和核心对象</li>
+<li>纸艺定格动画风格</li>
+<li>微缩纸雕舞台</li>
+<li>多层卡纸剪裁</li>
+<li>可见纸张纤维、折痕、缝隙、剪裁边缘和厚度</li>
+<li>层与层之间的真实物理投影</li>
+<li>微距摄影感和轻微景深</li>
+<li>必要时加入纸质标签、箭头或知识卡片</li>
+</ul>
+<p>不要把所有知识细节塞进一张图。一张图只传达一个主要概念。</p>
+<h2>STEP 10：撰写系列图提示词</h2>
+<p>当用户需要多个关键帧或分镜图时，输出系列图提示词。</p>
+<p>每张图包含：</p>
+<ul>
+<li>图号和目的</li>
+<li>相比上一张的变化</li>
+<li>共享画风锚点</li>
+<li>角色和场景一致性锚点</li>
+<li>提示词</li>
+</ul>
+<p>系列规则：</p>
+<ul>
+<li>保持同一纸张材质语言、光源方向、空间层级和角色身份。</li>
+<li>每张图只解释一个知识步骤。</li>
+<li>每条提示词都保留用户主题中的领域词。</li>
+<li>除非用户要求变化，否则系列图保持同一画幅比例。</li>
+</ul>
+<h2>STEP 11：撰写 5 秒图生视频提示词</h2>
+<p>为单张参考图写 5 秒动效提示词，保持纸艺风格不变。</p>
+<p>包含：</p>
+<ul>
+<li>保留纸张纹理、剪裁边缘、分层布景和真实投影</li>
+<li>缓慢推近、轻微横移或视差运动</li>
+<li>纸偶小幅定格式动作</li>
+<li>纸质箭头、标签、滑轨或机关轻微移动</li>
+<li>前景和背景产生视差</li>
+<li>避免光滑 CG 变形、融化、塑料质感或高速镜头</li>
+</ul>
+<p>动作要克制，并符合纸片物体的物理逻辑。</p>
+<h2>STEP 12：为已选时长创建分镜</h2>
+<p>使用创意方向阶段后用户已经选择的视频时长。默认不要同时提供 15/30/60 秒三套完整分镜。先给一个简短的内容概述，再只为已选时长输出简洁分镜表。</p>
+<p>内容概述保持简洁：</p>
+<ul>
+<li>一句话视频主线</li>
+<li>目标时长和比例</li>
+<li>主要视觉结构</li>
+<li>知识路径：钩子 → 解释 → 例子或文化连接 → 记忆句</li>
+</ul>
+<p>分镜表规则：</p>
+<ul>
+<li>表格文字尽量短，不要在单元格里写长段落。</li>
+<li>只列出该时长真正需要的镜头。</li>
+<li>15 秒：通常 4 个镜头。</li>
+<li>30 秒：通常 5-6 个镜头。</li>
+<li>60 秒：通常 7-9 个镜头。</li>
+<li>每个镜头只解释一个知识节拍。</li>
+</ul>
+<p>必备列：</p>
+<ul>
+<li>时间</li>
+<li>知识节拍</li>
+<li>画面动作</li>
+<li>纸艺运动</li>
+<li>运镜 / 转场</li>
+<li>音效</li>
+</ul>
+<p>表格后用选择卡片询问用户：继续剪辑节奏和运镜、修改分镜、改视频时长，或回到视觉预览。</p>
+<h2>STEP 13：定义剪辑节奏</h2>
+<p>根据时长和理解清晰度设置节奏。</p>
+<p>规则：</p>
+<ul>
+<li>15 秒：4-6 个镜头，快但可读，每镜 2-4 秒。</li>
+<li>30 秒：6-8 个镜头，每镜 3-5 秒。</li>
+<li>60 秒：8-12 个镜头，每镜 4-7 秒。</li>
+<li>标签卡出现时短暂停顿。</li>
+<li>观众看懂纸片机关前不要急切。</li>
+<li>用纸片动作形成节奏，不用强烈数码快切。</li>
+</ul>
+<h2>STEP 14：定义运镜规则</h2>
+<p>运镜应像在拍一个微缩纸艺舞台。</p>
+<p>推荐运镜：</p>
+<ul>
+<li>缓慢推近，进入纸艺世界</li>
+<li>横向平移，展示多层视差</li>
+<li>固定中景，用于主持讲解</li>
+<li>微距特写，展示纸张纹理和关键道具</li>
+<li>轻微俯视，展示剖面结构</li>
+<li>层间穿梭，进入对象内部结构</li>
+</ul>
+<p>避免：</p>
+<ul>
+<li>高速飞行镜头</li>
+<li>除非布景专门支持，否则不要 360 度大环绕</li>
+<li>数码故障运动</li>
+<li>液体融化变形</li>
+<li>超写实 CG 镜头行为</li>
+</ul>
+<h2>STEP 15：定义转场规则</h2>
+<p>转场必须符合纸艺世界的物理逻辑。</p>
+<p>推荐转场：</p>
+<ul>
+<li>翻页</li>
+<li>立体书展开</li>
+<li>抽拉标签</li>
+<li>纸质标签牌遮挡</li>
+<li>云朵纸片滑过</li>
+<li>圆形纸片遮罩</li>
+<li>剪纸门打开</li>
+<li>剖面层分开</li>
+<li>纸屑飞散</li>
+<li>胶带或贴纸揭示</li>
+</ul>
+<p>除非用户明确需要反差效果，否则避免电子扫描线、霓虹故障、玻璃破碎、金属擦除和科幻粒子转场。</p>
+<h2>STEP 16：定义声音设计</h2>
+<p>建立触感明确的手工声音库。</p>
+<p>推荐音效：</p>
+<ul>
+<li>翻纸声</li>
+<li>剪纸声</li>
+<li>卡纸滑动声</li>
+<li>纸张摩擦声</li>
+<li>小木头卡扣声</li>
+<li>轻微弹出声</li>
+<li>胶带撕拉声</li>
+<li>纸偶关节轻响</li>
+<li>纸盒打开声</li>
+<li>纸屑散落声</li>
+</ul>
+<p>配乐方向：</p>
+<ul>
+<li>BGM 要匹配用户主题、文化语境和情绪，不只匹配通用纸艺风。</li>
+<li>遇到有明确文化属性的主题时，围绕该主题的音乐语言设计。比如中秋科普应偏清雅国风：古筝、琵琶、竹笛或箫、轻打击、柔和弦乐，并给旁白留白。</li>
+<li>没有强文化属性的科学或课堂主题，可使用木琴、马林巴、拨弦、轻打击、温暖教育感。</li>
+<li>旁白下方保持轻柔，最终混音时要做压低或 ducking。</li>
+<li>除非用户要求，否则避免厚重电影低频、强烈电音、未来电子质感或过度戏剧化配乐。</li>
+</ul>
+<p>纸艺动效音效方向：</p>
+<ul>
+<li>音效要来自视频里的真实动作节拍：翻页、纸门打开、纸轨滑动、卡片翻动、纸抽屉拉出、纸盒打开、纸层叠合、轻柔 pop、纸偶关节轻响、纸张摩擦。</li>
+<li>音效只做触感点缀，让纸片运动更有物理感，不要变成夸张卡通音效。</li>
+<li>最终混音前要先把音效映射到分镜时间轴，让动作、旁白和声音互相强化。</li>
+</ul>
+<h2>STEP 17：生成并清理旁白音频</h2>
+<p>当流程包含旁白时，先在旁白脚本确认后生成配音，再检查音频质量，确认无问题后再进入最终合成。</p>
+<p>旁白规则：</p>
+<ul>
+<li>声音气质要匹配主题和观众：亲子或教育主题使用温暖、清晰、轻柔的声音；课堂或技术讲解可更中性。</li>
+<li>对比旁白时长和已选视频时长。若偏差超过 20%，必须用卡片询问用户：压短文案、延展视频，还是接受不匹配。</li>
+<li>检查尾部杂音、点击声、气口残留、突兀截断或模型尾音残留。</li>
+<li>如果尾部有杂音，优先修复已有音频：裁掉杂音尾部并加短淡出。若声音表现本身合适，不要优先重录。</li>
+<li>如果需要重录，提示词里明确要求结尾干净、无尾部杂音；生成后仍要再次检查。</li>
+</ul>
+<h2>STEP 18：提供反向提示词</h2>
+<p>始终输出简洁的反向提示词块，以保护画风。</p>
+<p>推荐反向提示词：</p>
+<ul>
+<li>光滑塑料 3D</li>
+<li>高亮 CG 渲染</li>
+<li>真人实拍</li>
+<li>普通扁平矢量插画</li>
+<li>没有纸张纹理的普通卡通</li>
+<li>金属科幻表面</li>
+<li>玻璃材质</li>
+<li>赛博朋克霓虹</li>
+<li>数码故障特效</li>
+<li>油画笔触</li>
+<li>真实毛发或皮肤毛孔</li>
+<li>没有纸张纤维</li>
+<li>没有剪裁边缘</li>
+<li>没有层间投影</li>
+<li>边缘过度平滑</li>
+<li>高速镜头环绕</li>
+<li>融化或液体变形</li>
+</ul>
+<h2>STEP 19：执行审核清单</h2>
+<p>结尾输出审核清单。只标出对用户目标真正重要的问题。</p>
+<h3>画风审核</h3>
+<ul>
+<li>是否能看到纸张纤维、折痕、缝隙和剪裁边缘？</li>
+<li>是否能看到卡纸厚度？</li>
+<li>层与层之间是否有真实投影？</li>
+<li>画面是否像微缩摄影，而不是平面插画？</li>
+<li>是否避免了塑料 CG 和真人写实？</li>
+</ul>
+<h3>角色审核</h3>
+<ul>
+<li>角色是否像纸偶？</li>
+<li>五官和表情是否足够剪纸化？</li>
+<li>关节和四肢是否像分件组装？</li>
+<li>动作是否保持定格动画的物理感？</li>
+</ul>
+<h3>场景审核</h3>
+<ul>
+<li>是否有清楚的前景、中景、背景和远景？</li>
+<li>道具是否都是纸艺材质，并服务讲解？</li>
+<li>标签、箭头和卡片是否没有挡住核心模型？</li>
+<li>每个镜头是否只解释一个知识节拍？</li>
+</ul>
+<h3>视频审核</h3>
+<ul>
+<li>运镜是否符合微缩摄影逻辑？</li>
+<li>转场是否符合纸片物理逻辑？</li>
+<li>音效是否匹配纸张、卡纸和纸偶动作？</li>
+<li>分镜时长是否匹配目标时长？</li>
+<li>最后的记忆句是否清楚？</li>
+</ul>
+<h3>音频审核</h3>
+<ul>
+<li>旁白时长是否匹配已选视频时长，或已通过卡片确认解决偏差？</li>
+<li>旁白结尾是否干净，没有尾部杂音、点击声、气口残留或突兀截断？</li>
+<li>BGM 是否匹配主题文化和情绪，而不只是泛纸艺风？</li>
+<li>BGM 是否在旁白下方，不抢讲解信息？</li>
+<li>纸艺动效音效是否对齐真实画面动作，并且足够克制？</li>
+</ul>
+</div>
+</section>
+  <div class="footer">由 SKILL.cn.md 自动整合生成 · 共 8 篇</div>
+</main>
+<script>
+window.addEventListener('scroll', function () {
+  var h = document.documentElement;
+  var p = h.scrollTop / (h.scrollHeight - h.clientHeight) * 100;
+  document.getElementById('progress').style.width = p + '%';
+});
+</script>
+</body>
+</html>

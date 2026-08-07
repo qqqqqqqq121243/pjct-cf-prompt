@@ -1,0 +1,204 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>MiniMax H3 理论速度验证 · 架构反推 vs 显卡硬件 vs 社区实测</title><style>
+:root{--bg:#07121f;--panel:#0d1d30;--line:#243b58;--text:#eef5ff;--mute:#99adc6;--cyan:#55d8ff;--gold:#ffcc66;--pink:#ff759f;--green:#62df9c;--red:#ff6b81}*{box-sizing:border-box}html,body{min-height:100%;width:100%}body{margin:0;background:radial-gradient(circle at 83% 0,#193858 0,transparent 38%),linear-gradient(135deg,#0b1b2d,#07121f 58%,#0a192a);color:var(--text);font:14px/1.55 Inter,"Microsoft YaHei",Arial}.wrap{width:100%;max-width:1280px;margin:0 auto;padding:36px 24px 60px}.eyebrow{font-size:12px;font-weight:bold;letter-spacing:1.2px;color:var(--cyan)}h1{font-size:30px;margin:5px 0 6px}h2{font-size:19px;margin:0 0 4px;color:#fff}p{color:var(--mute);margin:0}.top{display:flex;justify-content:space-between;gap:18px;align-items:end}.stamp{font-size:12px;border:1px solid var(--line);border-radius:8px;padding:8px 12px;background:#0a1929;color:#b6c8dd;max-width:330px}.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin:24px 0}.kpi,.panel{background:linear-gradient(145deg,#11243b,#0c192a);border:1px solid var(--line);border-radius:13px}.kpi{padding:15px}.kpi span{font-size:12px;color:var(--mute)}.kpi b{display:block;font-size:22px;color:var(--cyan);margin:3px 0}.kpi b.warm{color:var(--gold)}.kpi b.hot{color:var(--pink)}.panel{padding:20px;margin-top:16px}.head{display:flex;justify-content:space-between;gap:14px;align-items:start;margin-bottom:14px}.legend{display:flex;gap:14px;flex-wrap:wrap;color:var(--mute);font-size:12px;margin-bottom:10px}.dot{height:9px;width:9px;display:inline-block;border-radius:50%;margin-right:4px}.formula{background:#0a1828;border:1px solid var(--line);border-left:3px solid var(--cyan);border-radius:8px;padding:12px 14px;margin:10px 0;font-size:13px;color:#cfe4f5;overflow-x:auto}.formula code{color:var(--gold);font-family:Consolas,monospace}.tablebox{overflow:auto;max-height:560px;border:1px solid var(--line);border-radius:10px}table{width:100%;border-collapse:collapse;font-size:12px;background:#0c1b2e}th{position:sticky;top:0;background:#0e1e32;color:#90a9c4;text-align:left;z-index:2;cursor:pointer;white-space:nowrap}th:hover{color:var(--cyan)}th,td{padding:8px 9px;border-bottom:1px solid #203650;white-space:nowrap}tr:hover td{background:#11274200;background:linear-gradient(90deg,#122a46,#0d2037)}.tag{padding:2px 6px;border-radius:5px;font-size:11px}.t-good{background:#12351f;color:#74e2af;border:1px solid #1e6b3a}.t-warn{background:#3d2e12;color:#ffd27a;border:1px solid #8a6420}.t-bad{background:#421820;color:#ff9bb8;border:1px solid #93324a}.t-info{background:#122a3d;color:#8fd8ff;border:1px solid #2a5f7d}.t-dim{background:#1c2733;color:#8b9db1;border:1px solid #34465a}.num{text-align:right}.muted{color:#7f93ad}.ok{color:var(--green);font-weight:bold}.bad{color:var(--red);font-weight:bold}.warm{color:var(--gold);font-weight:bold}.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}.bars{display:flex;flex-direction:column;gap:7px}.bar{display:grid;grid-template-columns:170px 1fr 1fr 56px;gap:8px;align-items:center;font-size:12px}.bar .nm{text-align:right;font-weight:600;overflow:hidden;text-overflow:ellipsis}.bar .tr{position:relative;height:15px;background:#0d2033;border:1px solid #27415f;border-radius:3px;overflow:visible}.bar .tr i{position:absolute;top:0;height:100%;background:#123b57;border:1px solid var(--cyan);border-radius:2px;opacity:.85}.bar .tr i.m{background:linear-gradient(90deg,#3d6a2e,#62df9c);border-color:#a4e8c2;opacity:.95}.bar .tr i.l{top:15px;height:2px;background:#aebfce}.bar .v{text-align:right;font-size:11px;color:#cfe0ef}.ratio{text-align:right;font-weight:bold}.axis-lab{display:flex;justify-content:space-between;color:#7f99b6;font-size:10px;margin:2px 0 0 170px;padding:0 56px}.insight{border-left:3px solid var(--gold);padding:10px 12px;margin:12px 0;color:#b7c8dc;background:#0d1c2d;border-radius:0 8px 8px 0}.insight b{color:#fff}.calc{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:14px}.calc label{display:block;font-size:12px;color:var(--mute);margin-bottom:4px}.calc select,.calc input{width:100%;background:#0d2033;border:1px solid #355679;color:#fff;border-radius:7px;padding:7px 8px;font-size:13px}.out{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}.out .kpi b{font-size:18px}ol{margin:8px 0;padding-left:20px}li{margin:5px 0;color:#b7c8dc}footer{margin-top:28px;font-size:11px;color:#5f7590}footer a{color:#7fb4d8}@media(max-width:900px){.kpis{grid-template-columns:repeat(2,1fr)}.grid2,.calc,.out{grid-template-columns:1fr 1fr}.bar{grid-template-columns:110px 1fr 1fr 48px}}@media(max-width:560px){.kpis,.calc,.out{grid-template-columns:1fr}.top{display:block}.stamp{margin-top:10px}}
+</style></head><body><main class="wrap">
+<header class="top"><div><div class="eyebrow">THEORETICAL VERIFICATION · MINIMAX H3</div><h1>H3 理论速度验证：架构反推 × 显卡规格 × 社区实测</h1><p>以 H3-Base 真实架构（33B dense / 有效 ~20B、VAE 16×4、1×2×2 patchify、Qwen3-VL-32B 编码器）反推各分辨率·时长下的计算量，用各显卡的<b style="color:#fff">显存容量 / 带宽 / 稠密 INT8 算力</b>推导理论预估时间，并与 <b style="color:#fff">6000PRO 基准台账</b>的社区实测逐卡对照，评估数据可信度。</p></div><div class="stamp">基准：6000PRO 96GB · int8+pruned nvfp4<br>20步 · EasyCache · 含2图参考<br>0.4MP/5s=58s · 1MP/5s=198s</div></header>
+
+<section class="kpis">
+<div class="kpi"><span>H3 有效推理参数（33B 中 AdaLN 分支不加载）</span><b>≈ 20B</b><span>INT8 权重 ≈ 19.5 GB</span></div>
+<div class="kpi"><span>完整推理显存需求（扩散+编码器+缓存）</span><b class="warm">≈ 34 GB</b><span>19.5 + 14.6(NVFP4编码器) + 缓存</span></div>
+<div class="kpi"><span>0.4MP·5s 单任务 INT8 计算量</span><b>≈ 9.7 PFLOP</b><span>12,150 token × 20步 × 2×20B</span></div>
+<div class="kpi"><span>0.4MP·5s 理论算力下限（6000PRO）</span><b>≈ 9.7s</b><span>实测 58s → 效率约 17%（含注意力/VAE/编码器开销）</span></div>
+</section>
+
+<section class="panel">
+<div class="head"><div><h2>① 模型侧反推：H3 一次生成到底算了多少账</h2><p>由公开架构数据推导 token 数与计算量 —— 这是"预估时间"的第一块基石。</p></div></div>
+<div class="formula"><b style="color:#fff">Token 数</b>：VAE f16t4d24（空间 16×、时间 4×）→ patchify 1×2×2（t×h×w），故进入 Transformer 的视觉 token = (H/32)×(W/32)×(帧数/4)，帧数 = 时长×24fps<br><b style="color:#fff">每步计算量</b>：<code>FLOPs ≈ 2 × P_eff × token</code>（dense 前向，P_eff ≈ 20B）<br><b style="color:#fff">算力下限</b>：<code>T_flops = FLOPs × 步数 ÷ 稠密INT8算力</code>　<b style="color:#fff">带宽下限</b>：<code>T_band = 权重字节 × 步数 ÷ 显存带宽</code></div>
+<div class="tablebox"><table><thead><tr><th>分辨率</th><th class="num">像素</th><th class="num">5s token</th><th class="num">15s token</th><th class="num">5s FLOPs(20步)</th><th class="num">15s FLOPs(20步)</th></tr></thead><tbody id="tokTb"></tbody></table></div>
+<div class="insight"><b style="color:#fff">关键结论一：INT8 量化后模型只剩 19.5GB，带宽下限低到可忽略。</b>以 6000PRO（1792GB/s）算 0.4MP·5s 的带宽下限仅 <b>0.22s</b>（19.5GB×20步÷1792GB/s ≈ 0.22s），远小于实测 58s。因此本任务在 INT8 下是<b>算力受限 + 注意力/调度开销</b>型负载，而不是显存带宽受限 —— 单看带宽猜速度会完全失真。</div>
+<div class="insight"><b style="color:#fff">关键结论二：注意力的超线性膨胀。</b>1MP 的 token 是 0.4MP 的 2.55 倍，但 6000PRO 实测 198s/58s = 3.41 倍 —— 序列越长，注意力与 KV 缓存开销占比越高，效率随分辨率下降。</div>
+</section>
+
+<section class="panel">
+<div class="head"><div><h2>② 显卡硬件规格表（显存 / 带宽 / 频率 / 稠密 INT8 算力）</h2><p>点击表头排序。AI TOPS 列采用"官方稀疏值 ÷2"或实测折算，均为<b style="color:#fff">稠密口径</b>（H3 INT8 矩阵乘不使用 2:4 稀疏）。</p></div></div>
+<div class="tablebox"><table id="hw"><thead><tr><th data-k="name">显卡</th><th data-k="vram" class="num">显存</th><th data-k="bw" class="num">带宽GB/s</th><th data-k="mem">内存</th><th data-k="gbps" class="num">频率Gbps</th><th data-k="bits" class="num">位宽</th><th data-k="tops" class="num">稠密INT8 TOPS</th><th data-k="src">算力来源</th></tr></thead><tbody></tbody></table></div>
+<div class="insight"><b style="color:#fff">重要背景：5090D 是 5090 的"阉割版"。</b>实测（mma_test）5090D 稠密 INT8 仅 431 TOPS，约为 5090（685 TOPS）的 63%；FP16 370 TFLOPS 约为 54%。显存与带宽不变（32GB / 1792GB/s）。这正好可以用来说明 5090D 在算力敏感负载下应比 5090 慢约 1.6 倍 —— 但社区样本显示差距很小（见③④），说明其上报样本采用了更激进的加速配置，或样本量太少（n=2）。</div>
+</section>
+
+<section class="panel">
+<div class="head"><div><h2>③ 理论预估 vs 社区实测（0.4MP · 5s，样本最多）</h2><p>预估 = 6000PRO 锚点 58s × (1000 TOPS ÷ 目标卡稠密INT8 TOPS)，即纯算力等比缩放；未计入显存卸载惩罚。金色=实测中位数，青色=理论预估。</p></div></div>
+<div class="legend"><span><i class="dot" style="background:var(--cyan)"></i>理论预估（算力等比）</span><span><i class="dot" style="background:var(--green)"></i>社区实测中位数</span><span><i class="dot" style="background:#aebfce"></i>浅线=同卡样本极差</span><span>右侧数字 = 实测 ÷ 预估</span></div>
+<div class="bars" id="bars04"></div>
+<div class="axis-lab"><span>10s</span><span>30s</span><span>100s</span><span>300s</span><span>1000s</span></div>
+<div class="insight"><b style="color:#fff">怎么读这张图：</b>比率 ≈ 1 → 该卡行为与"纯算力等比"一致（数据自洽）；比率明显 &gt; 1.5 → 该卡多数上报未加速 / 显存不足在卸载，或社区没用到 INT8+剪枝工作流；比率 &lt; 0.7 → 大概率用了 FP4 级量化或更少步数，比"理论下限假设"还激进。</div>
+</section>
+
+<section class="panel">
+<div class="head"><div><h2>④ 理论预估 vs 社区实测（1MP · 5s，交叉验证）</h2><p>预估 = 198s × (1000 ÷ TOPS)。样本更少，仅作方向性校验。</p></div></div>
+<div class="bars" id="bars1"></div>
+<div class="axis-lab"><span>100s</span><span>300s</span><span>1000s</span><span>3000s</span></div>
+</section>
+
+<section class="panel">
+<div class="head"><div><h2>⑤ 逐卡可信度判定</h2><p>判定依据：0.4MP·5s 与 1MP·5s 的实测/预估比率、同卡样本离散度、显存是否容纳 34GB 需求。</p></div></div>
+<div class="tablebox"><table><thead><tr><th>显卡</th><th class="num">显存</th><th class="num">预估 0.4MP/5s</th><th class="num">实测 0.4MP/5s</th><th class="num">比率</th><th class="num">预估 1MP/5s</th><th class="num">实测 1MP/5s</th><th class="num">样本极差</th><th>判定</th><th>说明</th></tr></thead><tbody id="verdict"></tbody></table></div>
+</section>
+
+<section class="panel">
+<div class="head"><div><h2>⑥ 交互计算器：任选显卡与规格估算耗时</h2><p>展示算力下限（理论极限）与经验预估区间（下限×6~10，含注意力/VAE/编码器/调度开销，随 token 数增大而升高）。显存判断按扩散 INT8 19.5GB + 编码器 NVFP4 14.6GB + 缓存 ≈ 34GB 需求。</p></div></div>
+<div class="calc"><div><label>显卡</label><select id="selCard"></select></div><div><label>分辨率(MP)</label><select id="selMP"></select></div><div><label>时长(秒)</label><select id="selDur"></select></div><div><label>采样步数</label><select id="selSteps"></select></div></div>
+<div class="calc"><div><label>精度</label><select id="selPrec"><option value="1">INT8 / FP8（×1.0）</option><option value="2">BF16 / FP16（×2.0）</option></select></div><div><label>剪枝</label><select id="selPrune"><option value="1">已剪枝 20B（×1.0）</option><option value="1.65">未剪枝 33B（×1.65）</option></select></div><div><label>注意力加速</label><select id="selAttn"><option value="1">原生全注意力（×1.0）</option><option value="0.75">SageAttention 等（×0.75）</option></select></div><div><label>显存卸载</label><select id="selOff"><option value="1">全显存</option><option value="1.3">20GB(魔改/原厂大显存)</option><option value="1.7">轻度卸载(16GB)</option><option value="3">重度卸载(≤12GB)</option></select></div></div>
+<div class="calc"><div><label>系统内存 RAM</label><select id="selRAM"><option value="1">≥64GB 充足（×1.0）</option><option value="1.4">32GB 临界（×1.4）</option><option value="3">16GB 不足（×3 或跑崩）</option></select></div><div><label>PCIe 通道</label><select id="selPCIe"><option value="1">PCIe 4.0 ×16（×1.0）</option><option value="1.4">PCIe 3.0 老平台（×1.4）</option></select></div><div class="kpi" style="grid-column:span 2"><span style="font-size:12px">内存系数仅"卸载/低内存"时生效；全显存时自动忽略</span><b style="font-size:14px;color:var(--gold)" id="oRamHint">—</b></div></div>
+<div class="out"><div class="kpi"><span>视觉 Token 数</span><b id="oTok">—</b><span id="oTok2">—</span></div><div class="kpi"><span>单任务 INT8 计算量</span><b class="warm" id="oFlop">—</b><span id="oPrec">配置修正系数：—</span></div><div class="kpi"><span>算力下限（理论最快）</span><b id="oMin">—</b><span id="oBand">—</span></div><div class="kpi"><span>经验预估区间</span><b id="oEst">—</b><span id="oVRAM">—</span></div></div>
+</section>
+
+<section class="panel">
+<div class="head"><div><h2>⑨ 精度 × 剪枝 × 注意力加速：因素敏感性分析</h2><p>上面所有"理论预估"都假设 <b style="color:#fff">INT8 + 已剪枝 + 原生注意力 + 全显存</b>。而社区实际跑法差异极大，这些因素对耗时的影响往往比显卡差距还大 —— 下表量化每个因素，并据此重新拆解 ⑤ 中的偏差比率。</p></div></div>
+<div class="tablebox"><table><thead><tr><th>因素</th><th>取值</th><th class="num">对耗时影响</th><th>说明</th></tr></thead><tbody>
+<tr><td rowspan="2"><b>精度</b></td><td>INT8 / FP8</td><td class="num">×1.0</td><td>Blackwell/Ada 原生张量核；FP8 与 INT8 同速，权重 20GB</td></tr>
+<tr><td>BF16 / FP16</td><td class="num">×2.0</td><td>稠密算力约减半；权重 40GB → 24GB 以下必卸载</td></tr>
+<tr><td rowspan="2"><b>AdaLN 剪枝</b></td><td>已剪枝（有效 20B）</td><td class="num">×1.0</td><td>推荐工作流，权重 19.5GB</td></tr>
+<tr><td>未剪枝（33B）</td><td class="num">×1.65</td><td>计算量+65%、权重 33GB，24GB 卡也放不下</td></tr>
+<tr><td rowspan="2"><b>注意力加速</b></td><td>原生全注意力</td><td class="num">×1.0</td><td>token 越多注意力占比越高</td></tr>
+<tr><td>SageAttention 等加速节点</td><td class="num">×0.7~0.8</td><td>FP8/INT8 注意力内核；Ampere 上收益小/不可用</td></tr>
+<tr><td rowspan="4"><b>显存卸载</b></td><td>≥34GB 全显存</td><td class="num">×1.0</td><td>INT8 剪枝全显存</td></tr>
+<tr><td>20GB（魔改 / 大显存原厂）</td><td class="num">×1.2~1.5</td><td>权重勉强放下，编码器/缓存仍需换出；带宽算力不变，仅容量翻倍</td></tr>
+<tr><td>16GB</td><td class="num">×1.5~2</td><td>编码器/部分权重换入换出</td></tr>
+<tr><td>8~12GB</td><td class="num">×2.5~4</td><td>权重频繁经 PCIe/RAM 交换</td></tr>
+<tr><td rowspan="3"><b>内存 RAM</b></td><td>≥64GB（充足）</td><td class="num">×1.0</td><td>卸载权重 + 编码器 + 系统开销 ≈ 42GB 全装下，不碰磁盘</td></tr>
+<tr><td>32GB（临界）</td><td class="num">×1.3~1.6</td><td>42GB 需求放不下，部分经磁盘 swap；若再开浏览器/后台更糟</td></tr>
+<tr><td>16GB（不足）</td><td class="num">×2.5~5 / 跑崩</td><td>磁盘 swap（NVMe ~3.5GB/s、SATA ~0.5GB/s，比 PCIe 慢 10~100×）——"4小时/跑不动"样本的主因</td></tr>
+<tr><td rowspan="2"><b>PCIe 通道</b></td><td>PCIe 4.0 ×16</td><td class="num">×1.0</td><td>32GB/s，卸载传输较快</td></tr>
+<tr><td>PCIe 3.0（Ampere 老平台常见）</td><td class="num">×1.3~1.5</td><td>16GB/s 减半，卸载惩罚叠加放大；2080Ti/3090/3080 用户普遍是 3.0 平台</td></tr>
+<tr><td rowspan="2"><b>调度</b></td><td>EasyCache 等缓存节点</td><td class="num">×0.7~0.9</td><td>复用相邻去噪步的缓存</td></tr>
+<tr><td>默认采样器</td><td class="num">×1.0</td><td>无缓存复用</td></tr>
+</tbody></table></div>
+<div class="formula"><b style="color:#fff">组合公式</b>：<code>T ≈ 算力下限 × 基准效率系数(≈6×,随token增大至8~10×) × 精度 × 剪枝 × (1÷注意力加速) × 卸载系数 × 内存系数 × PCIe系数</code><br><b style="color:#fff">示例</b>：3090 跑 BF16（×2.0）且 Ampere 无 FP8 加速（×1.4）→ 2.8× ≈ 实测 2.79×；4060Ti 跑 BF16（×2.0）× 卸载（×1.5）→ 3.0× ≈ 实测 2.68×；10GB 3080 + 32GB RAM + PCIe3.0 → 卸载(×3) × 内存swap(×1.4) × PCIe(×1.4) ≈ ×5.9 —— 这才是"未魔改 3080"的真实预期，与 20GB 版(×1.3)差出 4 倍。</div>
+<div class="formula"><b style="color:#fff">注意"同名卡、不同显存"</b>：3080 实际有三个版本 —— 10GB(320bit/760GB/s，本文档算力行口径)、<b>12GB 原厂</b>(384bit/912GB/s、CUDA 核更多)、<b>20GB 魔改</b>(320bit 不变、颗粒 1GB→2GB，带宽算力不变仅容量翻倍)。它们算力差异很小，但容量 10→20GB 让卸载系数从 ×2.5~4 降到 ×1.2~1.5，耗时可直接差 2~3 倍 —— 台账若混报三个版本，中位数会被"20GB 魔改版"拉快，这正是 3080 实测(340s)快于 10GB 版理论下限(483s)的最可能原因。</div>
+<div class="tablebox"><table><thead><tr><th>显卡</th><th class="num">实测/理论</th><th>最可能配置组合</th><th>重算预期</th><th>解释力</th></tr></thead><tbody id="attrTb"></tbody></table></div>
+<div class="formula"><b style="color:#fff">★ 实测校准（真机验证：3080 20G魔改 · 64GB RAM · PCIe4.0 · INT8剪枝扩散 + NVFP4编码器 + SageAttention + EasyCache）</b><br>
+三个实测点：<b style="color:#fff">0.4MP/4s=148s</b>（7.4s/it，token 9720，效率 2.28×）→ <b style="color:#fff">1MP/4s=560s</b>（28s/it，24768，3.39×）→ <b style="color:#fff">0.5MP/15s=1320s</b>（66s/it，45900，<b style="color:#fff">4.31×</b>）。token ×4.72 而实测时间 ×8.92 → 15s 超线性 <b style="color:#fff">1.89×</b>，命中模型"时长拉长注意力膨胀更陡（~1.8）"的预期。<br>
+拟合效率曲线：<code>E ≈ 2.28 × (token/9720)^0.41</code>（三点误差 &lt;2%）→ 折算 <b style="color:#fff">0.4MP/5s ≈ 203s</b>（台账 3080 中位 340s，快 1.7×）；<b style="color:#fff">1MP/5s ≈ 760s</b>（台账 2981s，快 3.9×）。</div>
+<div class="insight"><b style="color:#fff">校准结论：</b>① <b style="color:#fff">卸载系数回调至 ×1.0~1.1</b>：20GB 恰装 19.5GB 权重、NVFP4 编码器少量换出、PCIe4 快速回流 → 实测贴近算力下限，此前 ×1.3 高估了惩罚；② <b style="color:#fff">效率系数不是常数</b>：6000PRO 基准口径 ≈6×，本机优化配置按 <code>E≈2.28×(token/9720)^0.41</code> 从 2.28× 涨到 4.31×（15s）→ 台账"中位秒数"是平均配置，真机优化后可快 2~4 倍（计算器默认 6× 为保守口径）；③ 台账 3080 的 1MP/5s=2981s 样本判定为重度卸载/未优化，应剔除或降权。</div>
+<div class="insight"><b style="color:#fff">三个可复用的规律：</b>① <b>精度与剪枝是"免费倍数"</b>：INT8→BF16 直接 ×2，未剪枝再 ×1.65，两者叠加 = ×3.3，足以吃掉任何高端卡的硬件优势；② <b>SageAttention 是"追平理论值"的关键</b>（5060Ti/4090 样本吻合组几乎都开了加速）；Ampere 无 FP8 内核理论收益小，但 3080 20G 实测效率 2.28× 显示其 INT8 回退路径仍有可观收益，非"不可用"；③ <b>只要显存 &lt; 权重体积，卸载系数就主导一切</b>——这就是 16GB 与 96GB 卡同算力却差 2~4 倍的根本原因，也是 6000PRO 作为基准快得"不像话"的原因。</div>
+</section>
+
+<section class="grid2">
+<section class="panel">
+<div class="head"><div><h2>⑦ 结论：数据可信度评估</h2></div></div>
+<ol>
+<li><b style="color:#fff">整体可信、方向正确：</b>高端与中低端主流卡（5090、4090、5060Ti、5060、4070、2080Ti、5090D）实测中位数与"算力等比"预估偏差在 <b style="color:#fff">±40% 内</b>，说明 6000PRO 台账的主趋势是真实的，各卡相对快慢大体符合硬件算力。</li>
+<li><b style="color:#fff">偏差来自"配置组合"，不是硬件规格：</b>5080/5070Ti/4070S/4060/4060Ti/3090 实测比理论慢 2.3~3 倍，可由"显存卸载(16GB/12GB→×1.5~3) + BF16(×2) + 未剪枝(×1.65)"定量解释（见⑨ 逐卡拆解）。最典型：3090 的 2.79× ≈ BF16×2 与 Ampere 无 FP8 加速×1.4 的乘积；同卡样本极差普遍 3~10× 正是配置差异的直接证据。</li>
+<li><b style="color:#fff">3070/4070tisuper/5070laptop/3060laptop 的 &gt;20× 条目基本不可信</b>：与同卡其它口径（7~20×）断层式冲突。主因依次为 <b style="color:#fff">RAM 不足导致磁盘 swap</b>（32GB 以下内存 + 卸载权重 ≈ 42GB 需求）、未加速、后台占用、报数错误，应剔除。</li>
+<li><b style="color:#fff">3060/3080 快于理论已被实测校准：</b>3080 20G魔改 + 64GB RAM 真机实测 0.4MP/4s=148s、1MP/4s=560s（效率系数 2.28~3.39×，见⑨★实测校准），证实 20GB 版卸载 ≈×1.0；台账中位 340s 与 1MP 的 2981s 均为平均/未优化配置，前者快 1.8×、后者快 4.3×，用台账估 3080 必须问"版本 + 是否优化"。</li>
+<li><b style="color:#fff">5090D 数据不足（n=2）：</b>算力阉割 37% 在理论应体现 ~1.6× 差距，实测反而不比 5090 慢，样本太少 + 配置差异无法支撑结论，需更多数据。</li>
+</ol>
+<div class="insight"><b style="color:#fff">一句话结论：</b>这份台账<b style="color:#fff">相对排名可信、绝对秒数只代表"该用户的配置"</b>。用它估算某卡耗时，应取同卡同口径的中位数区间，并意识到上下浮动可达 2~4 倍 —— 差异九成来自量化/步数/加速插件/显存卸载，而非显卡本身。</div>
+</section>
+<section class="panel">
+<div class="head"><div><h2>⑧ 反推模型要点（速查）</h2></div></div>
+<div class="formula"><b style="color:#fff">H3-Base 架构</b>：33B dense 单流全模态 Transformer；约 13B 参数在 AdaLN 分支，推理时预计算缓存不加载 → 有效 <code>≈20B</code><br><b style="color:#fff">编码器</b>：Qwen3-VL-32B（取第50层隐状态），NVFP4 14.6GB / INT8 25.3GB<br><b style="color:#fff">视频 VAE</b>：f16t4d24（空间16×/时间4×/24通道）+ 1×2×2 patchify<br><b style="color:#fff">输出</b>：24FPS、默认短边768、最长15s；音频 32kHz 立体声（40Hz latent）<br><b style="color:#fff">量化体积</b>：BF16 61.7GB → INT8 31.7GB → 剪枝 INT8 19.5GB</div>
+<div class="insight"><b style="color:#fff">给用户的实际建议：</b>① 显存 ≥24GB 才能"扩散全显存"跑剪枝 INT8；16GB 需牺牲编码器精度或接受卸载；&lt;12GB 建议用官方低内存/FP4 路线。② <b style="color:#fff">显存 &lt; 34GB 的卡，内存（RAM）≥64GB 是"能不能流畅跑"的分水岭</b>：42GB 卸载需求若 RAM 只有 32GB，直接落入磁盘 swap，比 PCIe 卸载再慢一个数量级。③ 同分辨率下加大时长 token 数线性涨、但注意力开销超线性涨，15s 比 5s 贵不止 3 倍。④ 5090D 理论应慢 5090 约 1.4~1.6 倍（INT8 阉割 37%），买前请按此心理预期。</div>
+</section></section>
+
+<footer>数据来源：① MiniMax H3 官方开源说明（minimaxi.com / 媒体拆解）② NVIDIA 官方规格页（RTX PRO 6000 Blackwell、GeForce 50/40/30 系 AI TOPS 与带宽）③ mma_test / as-en 实测稠密算力 ④ 本目录台账《速度统计_对照_最终文本.md》《速度对比_基准6000PRO_全口径.md》。稠密 INT8 TOPS 中：5090/5090D=实测；5070Ti=as-en 实测；6000PRO≈1000(官方FP4 4000稀疏折算)；其余=官方"AI TOPS(稀疏)÷2"或按 SM×频率折算，误差约±30%，仅供量级比较。预估公式在⑨中加入精度/剪枝/注意力/卸载/内存系数：BF16 按稠密算力约减半计（INT8≈2×FP16），SageAttention 按 ×0.75 估，卸载系数 16GB≈1.5~2、≤12GB≈2.5~4，内存系数 32GB≈1.4、16GB≈2.5~5（磁盘 swap），PCIe3.0≈1.4，均为社区经验的量级估计；全显存模式下内存系数自动忽略。</footer>
+</main>
+<script>
+const P=2e10, BYTES=19.5e9, STEPS=20, ENC=14.6, TOT=34.1;
+const RES={0.2:[600,400],0.4:[864,480],0.5:[960,544],0.6:[1056,608],0.7:[1152,640],0.8:[1216,672],0.9:[1280,736],1.0:[1376,768],2.0:[1920,1088],3.0:[2144,1408]};
+const CARDS=[
+['6000PRO',96,1792,'GDDR7',28,512,1000,'官方FP4 4000(稀疏)折算',58,58,0,198,198,0,[58]],
+['5090',32,1792,'GDDR7',28,512,685,'mma_test实测',85,120,6,289,220,2,[54,120,581,780]],
+['5090D',32,1792,'GDDR7',28,512,431,'mma_test实测(阉割63%)',135,115,2,459,120,1,[90,140]],
+['5080',16,960,'GDDR7',30,256,360,'官方1801稀疏÷2≈折算',161,374,3,550,null,0,[160,374,375]],
+['5070Ti',16,896,'GDDR7',28,256,290,'as-en实测',200,475,2,683,1086,2,[230,720]],
+['5070',12,672,'GDDR7',28,192,200,'官方988稀疏÷2≈',290,null,0,990,1140,1,[1140]],
+['5060Ti',16,448,'GDDR7',28,128,150,'官方759稀疏÷2≈',387,372,10,1056,null,0,[153,210,240,372,702]],
+['5060',8,448,'GDDR7',28,128,125,'官方614稀疏÷2≈',464,420,1,1584,null,0,[420]],
+['4090',24,1008,'GDDR6X',21,384,660,'官方1321稀疏÷2',88,64,3,300,660,1,[44,64,130]],
+['4080',16,717,'GDDR6X',22.4,256,486,'官方972稀疏÷2',119,180,3,407,null,0,[102,180,200]],
+['4070TiS',16,672,'GDDR6X',21,256,445,'官方889稀疏÷2',130,600,1,445,null,0,[600]],
+['4070Ti',12,504,'GDDR6X',21,192,444,'官方888稀疏÷2',131,540,2,446,1950,2,[480,600]],
+['4070S',12,504,'GDDR6X',21,192,284,'官方568稀疏÷2',204,615,4,697,null,0,[271,450,780,2400]],
+['4070',12,504,'GDDR6X',21,192,233,'官方466稀疏÷2',249,230,2,850,null,0,[160,300]],
+['4060Ti',16,288,'GDDR6',18,128,347,'官方695稀疏÷2',167,447,4,571,null,0,[183,334,560,600]],
+['4060',8,272,'GDDR6',17,128,242,'官方484稀疏÷2',240,600,5,818,600,1,[342,385,600,600,720]],
+['3090',24,936,'GDDR6X',19.5,384,284,'官方INT8 568稀疏÷2',204,570,5,697,735,1,[180,488,570,3180]],
+['3080',10,760,'GDDR6X',19,320,120,'官方INT8 240稀疏÷2',483,340,3,1650,2981,1,[300,340,360]],
+['3060',12,360,'GDDR6',15,192,51,'官方INT8 102稀疏÷2',1137,600,3,3882,null,0,[180,600,600]],
+['2080Ti',11,616,'GDDR6',14,352,55,'官方INT8 110稀疏÷2',1055,1122,4,3600,null,0,[210,990,1254,1740]],
+['4050',6,192,'GDDR6',16,96,210,'官方421÷2≈折算(笔记本/桌面)',276,900,1,943,null,0,[900]]
+];
+const tok=(mp,dur)=>Math.round(RES[mp][0]/32)*Math.round(RES[mp][1]/32)*(dur*24/4);
+const flop=(mp,dur,s)=>2*P*tok(mp,dur)*s;
+// 表①
+document.getElementById('tokTb').innerHTML=Object.entries(RES).map(([k,r])=>{const p=r[0]*r[1];return `<tr><td>${k}MP</td><td class="num">${(p/1e6).toFixed(2)}M(${r[1]}×${r[0]})</td><td class="num">${tok(k,5).toLocaleString()}</td><td class="num">${tok(k,15).toLocaleString()}</td><td class="num">${(flop(k,5,20)/1e15).toFixed(1)}P</td><td class="num">${(flop(k,15,20)/1e15).toFixed(1)}P</td></tr>`}).join('');
+// 表② 硬件
+let hwK='name',hwD=1;const HWIDX={name:0,vram:1,bw:2,mem:3,gbps:4,bits:5,tops:6,src:7};
+const hwT=document.querySelector('#hw tbody');
+function hwRows(){const d=[...CARDS].sort((a,b)=>{const x=a[HWIDX[hwK]],y=b[HWIDX[hwK]];return (typeof x==='number'?x-y:String(x).localeCompare(String(y)))*hwD});hwT.innerHTML=d.map(c=>`<tr><td><b>${c[0]}</b></td><td class="num">${c[1]}GB</td><td class="num">${c[2]}</td><td>${c[3]}</td><td class="num">${c[4]}</td><td class="num">${c[5]}-bit</td><td class="num"><b>${c[6]}</b></td><td class="muted">${c[7]}</td></tr>`).join('')}
+document.querySelectorAll('#hw th').forEach(th=>th.onclick=()=>{const k=th.dataset.k;if(hwK===k)hwD*=-1;else{hwK=k;hwD=1}hwRows()});hwRows();
+// 图③④ 对数轴
+const P04=10,P1=100;
+const bars=(id,arr,p0)=>{const base=Math.log10(p0),lim=Math.log10(4000);const px=x=>(Math.log10(x)-base)/(lim-base)*100;
+document.getElementById(id).innerHTML=arr.map(c=>{const[m4,e4]=c;const w=e4?Math.max(1.5,px(e4)):0,wm=Math.max(1.5,px(m4));const r=e4?(e4/m4):null;const cls=r!=null?(r<0.7?'warm':r>1.8?'bad':'ok'):'muted';
+return `<div class="bar"><div class="nm">${c[0]}</div><div class="tr"><i class="m" style="left:0;width:${wm}%"></i><i style="left:0;width:${w}%"></i></div><div class="v">理论${m4}s${e4?` · 实测<b style="color:#fff">${e4}s</b>`:' · 无实测'}</div><div class="ratio ${cls}">${r!=null?r.toFixed(2)+'×':'—'}</div></div>`}).join('')};
+bars('bars04',CARDS.filter(c=>c[8]!==null).map(c=>[c[0],c[8],c[9],c[10]]),P04);
+bars('bars1',CARDS.filter(c=>c[11]!==null).map(c=>[c[0],c[11],c[12],c[13]]),P1);
+// 表⑤ 判定
+const verdict=(r04,r1,spr)=>{let tag,note;
+if(r04!=null&&r1!=null){if(Math.max(r04,r1)<1.5&&Math.min(r04,r1)>0.7){tag='t-good';note='与算力理论吻合'}else if(r04>1.8||r1>1.8){tag='t-bad';note='明显慢于理论(未加速/卸载/低效工作流)'}else if(r04<0.7||r1<0.7){tag='t-warn';note='快于理论(FP4/步数更少/口径差异)'}else{tag='t-info';note='大致吻合但有偏差'}}
+else if(r04!=null){tag=r04>1.8?'t-bad':r04<0.7?'t-warn':'t-good';note=r04>1.8?'明显慢于理论':r04<0.7?'快于理论':'与理论吻合'}
+else{tag='t-info';note='1MP样本不足，仅参考'};
+if(spr&&spr.length>1){const sp=Math.max(...spr)/Math.min(...spr);if(sp>4)note+=' · 极差'+sp.toFixed(1)+'×'};
+return `<span class="tag ${tag}">${tag==='t-good'?'吻合':tag==='t-warn'?'存疑·偏快':tag==='t-bad'?'存疑·偏慢':'参考'}</span><span class="muted">${note}</span>`};
+document.getElementById('verdict').innerHTML=CARDS.map(c=>{const r04=c[9]?c[9]/c[8]:null,r1=c[12]?c[12]/c[11]:null;const V=verdict(r04,r1,c[14]);const i=V.indexOf('</span>');const tagHtml=V.slice(0,i+7),noteHtml=V.slice(i+7);
+return `<tr><td><b>${c[0]}</b></td><td class="num">${c[1]}GB</td><td class="num">${c[8]}s</td><td class="num">${c[9]??'—'}</td><td class="num ${r04==null?'muted':r04>1.8?'bad':r04<0.7?'warm':'ok'}">${r04!=null?r04.toFixed(2)+'×':'—'}</td><td class="num">${c[11]}s</td><td class="num">${c[12]??'—'}</td><td class="num muted">${c[14]?(c[14].length>1?Math.min(...c[14])+'~'+Math.max(...c[14]):c[14][0]):'—'}</td><td>${tagHtml}</td><td class="muted">${noteHtml}</td></tr>`}).join('');
+// 归因表⑨
+const ATTR={
+'6000PRO':['—（基准自身，INT8剪枝全显存）','1.0×','—'],
+'5090':['INT8剪枝 · 32GB 略挤34GB → 轻度卸载 + 未开Sage','≈1.0×1.2=1.2','吻合(含未加速样本)'],
+'5090D':['INT8剪枝 · 样本n=2 且配置更好/开Sage','&lt;1.0','样本不足'],
+'5080':['INT8剪枝 · 16GB 重度卸载','≈1.0×2.0=2.0','吻合'],
+'5070Ti':['INT8剪枝 · 16GB 重度卸载','≈2.0','吻合'],
+'5070':['12GB 卸载 + 未加速','2~3','吻合(1MP口径5.76×)'],
+'5060Ti':['INT8剪枝 + SageAttention（10样本多为加速后）','≈1.0','吻合'],
+'5060':['8GB 重度卸载却偏快 → 疑FP4/少步数','&lt;1.0','存疑·偏快'],
+'4090':['INT8剪枝 + SageAttention + 全为加速配置(n=3)','&lt;1.0','吻合(样本少)'],
+'4080':['INT8剪枝 · 16GB 卸载','≈1.5','吻合'],
+'4070TiS':['12GB 卸载(2) × 未剪枝(1.65)=3.3 或 BF16','3~4','吻合'],
+'4070Ti':['12GB 卸载(2.5) + BF16 / 未剪枝','2.5~5','吻合'],
+'4070S':['12GB 卸载(2) × BF16(2)=4 或 未剪枝×卸载','3~4','吻合'],
+'4070':['INT8剪枝 · 样本n=2','≈1.0','吻合'],
+'4060Ti':['16GB 卸载(1.5) × BF16(2)=3','≈3.0','吻合'],
+'4060':['8GB 重度卸载(2.5)','≈2.5','吻合'],
+'3090':['BF16(2) × Ampere无FP8加速(1.4)=2.8','≈2.8','高度吻合'],
+'3080':['★实测校准(20G魔改+64G)：效率2.28~4.31×(token^0.41曲线)贴近算力下限→卸载≈×1.0；台账340s/2981s为平均/未优化配置','≈1.0~1.3','实测校准·吻合'],
+'3060':['12GB 偏快 → 疑FP4/少步数','&lt;1.0','存疑·偏快'],
+'2080Ti':['老卡样本极端（多为低配能跑）','≈1.0','巧合'],
+'4050':['6GB 重度卸载(3)','≈3.0','吻合']
+};
+document.getElementById('attrTb').innerHTML=CARDS.map(c=>{const r04=c[9]?c[9]/c[8]:null;const a=ATTR[c[0]]||['—','—','—'];
+return `<tr><td><b>${c[0]}</b></td><td class="num">${r04!=null?r04.toFixed(2)+'×':'—'}</td><td>${a[0]}</td><td>${a[1]}</td><td class="${a[2].includes('吻合')?'ok':a[2].includes('存疑')?'warm':'muted'}">${a[2]}</td></tr>`}).join('');
+// 计算器
+const selC=document.getElementById('selCard'),selM=document.getElementById('selMP'),selD=document.getElementById('selDur'),selS=document.getElementById('selSteps');
+const selPrec=document.getElementById('selPrec'),selPrune=document.getElementById('selPrune'),selAttn=document.getElementById('selAttn'),selOff=document.getElementById('selOff');
+CARDS.forEach(c=>{const o=document.createElement('option');o.value=c[0];o.textContent=c[0];selC.appendChild(o)});
+Object.keys(RES).forEach(k=>{const o=document.createElement('option');o.value=k;o.textContent=k+'MP';selM.appendChild(o)});
+[3,4,5,6,7,8,9,10,12,15].forEach(d=>{const o=document.createElement('option');o.value=d;o.textContent=d+'s';selD.appendChild(o)});
+[10,15,20,25,30].forEach(s=>{const o=document.createElement('option');o.value=s;o.textContent=s+'步';selS.appendChild(o)});
+selS.value='20';
+function calc(){const c=CARDS.find(x=>x[0]===selC.value),mp=selM.value,dur=+selD.value,st=+selS.value;
+const prec=+selPrec.value,prune=+selPrune.value,attn=+selAttn.value,off=+selOff.value;
+const ramV=+selRAM.value,pcieV=+selPCIe.value,ramK=off===1?1:ramV*pcieV,k=prec*prune*attn*off*ramK;
+const t=tok(mp,dur),f=flop(mp,dur,st),minS=f/(c[6]*1e12)*k,band=(19.5*prune*prec)*st/c[2],fac=6*Math.pow(t/12150,0.35);
+document.getElementById('oTok').textContent=t.toLocaleString();document.getElementById('oTok2').textContent=`${RES[mp][1]}×${RES[mp][0]} · ${dur*24}帧 · ${st}步`;
+document.getElementById('oFlop').textContent=(f/1e15).toFixed(2)+' PFLOP';document.getElementById('oPrec').textContent=`配置修正系数：${k.toFixed(2)}（精度${prec}×剪枝${prune}×注意力${attn}×卸载${off}×内存${ramK.toFixed(2)}）`;
+document.getElementById('oMin').textContent=minS.toFixed(0)+'s';document.getElementById('oBand').textContent=`带宽下限 ${band.toFixed(1)}s · 权重${(19.5*prune*prec).toFixed(1)}GB`;
+const est=[minS*fac,minS*fac*1.8];
+document.getElementById('oEst').textContent=`${est[0].toFixed(0)} ~ ${est[1].toFixed(0)}s`;
+const need=19.5*prune*prec+ENC+(t*40/1e6);let v=need>c[1]?`显存需求≈${need.toFixed(1)}GB &gt; ${c[1]}GB → 卸载/低内存模式，实际显著慢于区间`:need>c[1]*0.9?`接近满载(${need.toFixed(1)}GB/${c[1]}GB)`:c[1]>=TOT?'全显存可装(需≥34GB)':'可全显存运行';
+document.getElementById('oVRAM').textContent=v;
+const ramNeed=19.5*prune*prec+ENC+8;document.getElementById('oRamHint').textContent=off===1?`全显存模式：内存不参与（RAM 需求≈${ramNeed.toFixed(0)}GB 供参考）`:`卸载模式：RAM 需求≈${ramNeed.toFixed(0)}GB（权重+编码器+系统），${ramV>1.2?'当前内存档不足 → 磁盘 swap 风险':ramNeed>64?'需 ≥64GB 才不碰磁盘':'≥64GB 可全装下，当前档可承受'}`;}
+[selC,selM,selD,selS,selPrec,selPrune,selAttn,selOff,selRAM,selPCIe].forEach(e=>e.onchange=calc);calc();
+</script>
+</body></html>

@@ -11,11 +11,10 @@
 import json
 import requests
 import time
-from siliconflow_model_info import list_model_poor
+from siliconflow_model_info import list_model_poor  #硅基流动穷鬼模型名单
+from progress import p_moon
+from sk import secret_key as sk
 
-"""
-硅基流动穷鬼模型名单
-"""
 
 
 def api_counter(func):
@@ -32,9 +31,9 @@ def api_counter(func):
 class Own():   #之后要单开一个来存储
     def __init__(self) -> None:
         self.default = 0   #决定了选哪一个模型
-        self.sk = {"Qwen/Qwen3.5-27B":"sk-在此填入你的key",
-                    "Qwen/Qwen3-Omni-30B-A3B-Instruct":"sk-在此填入你的key",
-                    "zai-org/GLM-4.5V":"sk-在此填入你的key"}
+        self.sk = {"Qwen/Qwen3.5-27B":sk,
+                    "Qwen/Qwen3-Omni-30B-A3B-Instruct":sk,
+                    "zai-org/GLM-4.5V":sk}
         self.workspace = "O:/project/pjct-cf-prompt/llmloop"
     def __iter__(self):
         return iter(self.sk)
@@ -119,6 +118,7 @@ def res():
     for line in resp.iter_lines():
         to_sent = ""
         if not line or not line.startswith(b"data:"):
+            # print(f"\r{p_moon}",flush=True,end = "")
             continue
         if line.startswith(b"data: [DONE]"):
             break

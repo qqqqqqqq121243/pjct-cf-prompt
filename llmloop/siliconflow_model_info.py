@@ -49,3 +49,25 @@ list_model_poor = [
     "LoRA/Qwen/Qwen2.5-14B-Instruct",
     "LoRA/Qwen/Qwen2.5-32B-Instruct",
     "LoRA/Qwen/Qwen2.5-72B-Instruct"]
+
+# import json
+# with open(f'O:\project\pjct-cf-prompt\llmloop\models.json','r',encoding="utf-8") as f:
+#     aval_model = list(json.load(f))
+
+# collect_tags = [i['tags'] for i in aval_model]
+# c = {j for i in collect_tags for j in i}
+
+# B_tag = {x for x in c if x[-1] in "BbT" or (x[-1] == "M" and x != "1M")}
+
+# # 上下文大小：K/k 结尾，或特殊的 1M
+# long_tag = {x for x in c if x[-1] in "Kk" or x == "1M"}
+
+# normal_tag = (c - B_tag) - long_tag
+# print(B_tag,long_tag,normal_tag)
+# class Tag():
+#     def __init__(self):
+#         self.poor = list_model_poor
+#         self.B = B_tag
+#         self.long = long_tag
+#         self.normal = normal_tag
+

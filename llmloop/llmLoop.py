@@ -7,33 +7,30 @@
 
 """
 
-
+import threading
 import json
+from re import M
+from turtle import Turtle
 import requests
 import time
 from siliconflow_model_info import list_model_poor  #硅基流动穷鬼模型名单
 from progress import p_moon
-from sk import secret_key as sk
+from sk import secret_key 
 
 
 
-def api_counter(func):
-    def insider(*arg,**kwargs):
-        time0 = time.time()
-        result = func(*arg,**kwargs)
-        time1 = time.time()
-        print(f"用时{(time1-time0):2f}s")
-        return result
-    return insider
 
-
+important_tag= [
+    "Tools", "全模态",            # 你已有的
+    "视觉", "多模态理解 / 识别",   # 视觉/文档
+    ]
 
 class Own():   #之后要单开一个来存储
     def __init__(self) -> None:
         self.default = 0   #决定了选哪一个模型
-        self.sk = {"Qwen/Qwen3.5-27B":sk,
-                    "Qwen/Qwen3-Omni-30B-A3B-Instruct":sk,
-                    "zai-org/GLM-4.5V":sk}
+        self.sk = {"Qwen/Qwen3.5-27B":secret_key,
+                    "Qwen/Qwen3-Omni-30B-A3B-Instruct":secret_key,
+                    "zai-org/GLM-4.5V":secret_key}
         self.workspace = "O:/project/pjct-cf-prompt/llmloop"
     def __iter__(self):
         return iter(self.sk)
@@ -77,10 +74,55 @@ class Own():   #之后要单开一个来存储
         if code:
             self.sk.update({mdl:skey})
             print(f"模型 {mdl} 添加成功")
+user = Own()
+
+
+class Model_Config :
+    def __init__(self) -> None:
+
+        self.current_model = user.default
+        self.ori_setting = {k:[] for k in user.sk.keys(),}
+        # 思考（特殊，我把单独的思考模型认为是第三类） 视觉（0，1，2） 全模态 视频输入(特殊要手动开启，全模态自带)
+
+    def check(self,to_chcek_model :str):
+        with open(f'O:\project\pjct-cf-prompt\llmloop\models.json','r',encoding="utf-8") as f:
+            aval_model = list(json.load(f))
+            aval_model_processed = {i.get["name"]:i for i in aval_model}
+            print(aval_model_processed)
+
+            if "Instruct" in to_chcek_model and to_chcek_model.replace("Instruct","Thinking") in aval_model :
+                pass
+
+
+
+
+    
+
+class Model_Tag():
+    def __init__(self) -> None:
+
+        with open(f'O:\project\pjct-cf-prompt\llmloop\models.json','r',encoding="utf-8") as f:
+            aval_model = list(json.load(f))
+        collect_tags = [i['tags'] for i in aval_model]
+        c = {j for i in collect_tags for j in i}
+        self.items = c
+model_tag = Model_Tag()
+
+def api_counter(func):
+    def insider(*arg,**kwargs):
+        time0 = time.time()
+        result = func(*arg,**kwargs)
+        time1 = time.time()
+        print(f"用时{(time1-time0):2f}s")
+        return result
+    return insider
+
+
+
 
 client = requests.Session()
 
-user = Own()
+
 
 class Mes():    #这个我先暂时搁置
     def __init__(self) -> None:
@@ -107,7 +149,7 @@ def res():
             "model":f"{list(user.sk.keys())[user.default]}",# default -> "Qwen/Qwen3.5-27B"
             "messages": mes,
             "stream": True,
-            "enable_thinking": True,
+            "enable_thinking": ,
         },
         stream=True,
     )
@@ -116,16 +158,23 @@ def res():
     print()
 
     for line in resp.iter_lines():
+
         to_sent = ""
+        # if status == "None":
+            # print(f"\r{p_moon}",flush=True,end = "")    #月亮转转转进度条
         if not line or not line.startswith(b"data:"):
-            # print(f"\r{p_moon}",flush=True,end = "")
             continue
-        if line.startswith(b"data: [DONE]"):
-            break
+        # if line.startswith(b"data: [DONE]"):
+        #     break
         data = json.loads(line[5:])
         if not data.get("choices"):   # 空 choices 的收尾 chunk，跳过
+            if data.get("usage"):
+                usage = data.get("usage")
+                print(f"\n\ncompletion_tokens : {usage['completion_tokens']} - total_tokens{usage['total_tokens']}")
+                break
             continue
         delta = data["choices"][0]["delta"]
+
         if delta.get("reasoning_content"):
             status = "thinking☁"
             to_sent = delta['reasoning_content']
@@ -134,12 +183,17 @@ def res():
             status = "main🙂"
             to_sent = delta['content']
             con += delta.get("content")
-        if pre_status != status and status == "main🙂":
-            print(f"\n\n{status}",end='',flush=True)
+        if pre_status != status :
+            if status == "main🙂":
+                print(f"\n\n{status}",end='',flush=True)
+            elif status == "thinking☁":
+                pass
+
+        
         print(to_sent,end='',flush=True)
         pre_status = status
     mes.append({"role":"assistant","content":f"{con}"})
-    print()
+
 
 
 """

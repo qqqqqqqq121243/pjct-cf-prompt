@@ -9,13 +9,12 @@
 
 import threading
 import json
-from re import M
-from turtle import Turtle
 import requests
 import time
 from siliconflow_model_info import list_model_poor  #硅基流动穷鬼模型名单
 from progress import p_moon
 from sk import secret_key 
+import pynput.keyboard as keyboard
 
 
 
@@ -32,6 +31,7 @@ class Own():   #之后要单开一个来存储
                     "Qwen/Qwen3-Omni-30B-A3B-Instruct":secret_key,
                     "zai-org/GLM-4.5V":secret_key}
         self.workspace = "O:/project/pjct-cf-prompt/llmloop"
+
     def __iter__(self):
         return iter(self.sk)
     def test_sk(self,m ,s):   #先只做硅基流动的 来验证sk
@@ -55,9 +55,81 @@ class Own():   #之后要单开一个来存储
 
         return  1 if sta == 200 else 0
 
+    def select_model(self):
+        
+        self.tmp_model = None   #用来给增加模型时，暂时存放选择的模型
+        with open(f'O:/project/pjct-cf-prompt/llmloop/models_details.json','r',encoding="utf-8") as f:
+            aval_model = list(json.load(f))
+        poor_m = list_model_poor
+        all_m = [(item.get("name"),item.get("date"),1 if item.get("name") in poor_m else 0) for item in aval_model if item.get("name") not in user.sk.keys()]
+
+        def print_model(page,tar):
+            print("\033[2H")   #回到左上角
+
+            for itx,m in enumerate(all_m[page * 10 :(page + 1) * 10]):
+                #红色字体(31)，选择框为红色(41)，穷鬼模型为加粗(1)
+                print(f"\n\033[{1 if m[-1] == 1 else 0};{41 if tar == itx else 31}m{m[0]}"+f"\033[0m - {m[1]}"+50*" ",end="")  
+
+            
+
+        def user_select_model(key):
+            if key == keyboard.Key.left:
+                self.page = max(self.page - 1, 0)  #防止变 -1
+
+            elif key == keyboard.Key.right:
+                self.page = min(self.page + 1, (len(all_m)-1)//10) 
+
+            elif key == keyboard.Key.up:
+                if self.tar == 0:
+                    self.tar = 9
+                    self.page = max(self.page - 1, 0)  
+                else:
+                    self.tar = max(self.tar - 1, 0)  
+            elif key == keyboard.Key.down:
+                if self.tar == 9:
+                    self.tar = 0
+                    self.page = min(self.page + 1, (len(all_m)-1)//10) 
+                else:
+                    self.tar = min(self.tar + 1, 9) 
+            elif key == keyboard.Key.esc :
+                self.tmp_model = None
+                return False
+            elif key == keyboard.Key.enter:
+                self.tmp_model = all_m[self.page*10 + self.tar][0]
+                return False
+            
+            print_model(self.page,self.tar)
+
+            # print("\033[2J")   #清屏
+            # for itx,m in enumerate(all_m[self.page * 10 :(self.page + 1) * 10]):
+            #     #红色字体(31)，选择框为红色(41)，穷鬼模型为加粗(1)
+            #     print(f"\033[{1 if m[-1] == 1 else 0};{41 if self.tar == itx else 31}m{m[0]}",end="")  
+            #     print(f"\033[0m - date {m[1]}")
+
+
+        # all_m = all_m if len(all_m) % 10 == 0 else all_m + [("None",None,0) for _ in range(10 - len(all_m)%10)]
+
+        self.page = 0
+        self.tar = 0
+        print("\033[?25l", end="", flush=True)   # 进入选择界面时隐藏
+        print_model(0,0) #打印模型列表
+        #用户操作
+        with keyboard.Listener(on_press=user_select_model,suppress=True) as listener:
+            try:
+                listener.join()
+            except KeyboardInterrupt:      
+                self.tmp_model = None
+        print("\n\033[?25h", end="", flush=True)   # 退出时恢复
+        return self.tmp_model
+
+
     def add_sk(self):
-        mdl = input("请输入模型名称\n")
-        if mdl not in list_model_poor:
+        print("\033[2J")
+        mdl = self.select_model()
+        print("\033[2J")
+        if mdl == None :
+            return 0 
+        elif mdl not in list_model_poor:
             print("你当前所选择的模型不在代金卷名单内\n若要添加, 请输入 /y\n若取消添加, 请输入 /n")
             for turn in range(3,0,-1):   #事不过三
                 u_input = input(f"({turn})you-")
@@ -77,36 +149,22 @@ class Own():   #之后要单开一个来存储
 user = Own()
 
 
-class Model_Config :
-    def __init__(self) -> None:
-
-        self.current_model = user.default
-        self.ori_setting = {k:[] for k in user.sk.keys(),}
-        # 思考（特殊，我把单独的思考模型认为是第三类） 视觉（0，1，2） 全模态 视频输入(特殊要手动开启，全模态自带)
-
-    def check(self,to_chcek_model :str):
-        with open(f'O:\project\pjct-cf-prompt\llmloop\models.json','r',encoding="utf-8") as f:
-            aval_model = list(json.load(f))
-            aval_model_processed = {i.get["name"]:i for i in aval_model}
-            print(aval_model_processed)
-
-            if "Instruct" in to_chcek_model and to_chcek_model.replace("Instruct","Thinking") in aval_model :
-                pass
-
-
-
-
+# class Model_Config :
+#     def __init__(self) -> None:
+#         # 获得默认设定
+#         with open("O:/project/pjct-cf-prompt/llmloop/models_config.json",'r',encoding="utf-8") as f :
+#             ori_setting = json.load(f)
+#         self.current_model = user.default
+#         self.user_setting= ori_setting
+#         self.ori_settting = ori_setting
     
+#     def __call__(self,model):
+        
 
-class Model_Tag():
-    def __init__(self) -> None:
 
-        with open(f'O:\project\pjct-cf-prompt\llmloop\models.json','r',encoding="utf-8") as f:
-            aval_model = list(json.load(f))
-        collect_tags = [i['tags'] for i in aval_model]
-        c = {j for i in collect_tags for j in i}
-        self.items = c
-model_tag = Model_Tag()
+
+
+
 
 def api_counter(func):
     def insider(*arg,**kwargs):
@@ -141,18 +199,22 @@ def res():
     请求 + 流式输出
     
     """
-    to_sent,pre_status,status = "","None","None"
-    resp = client.post(
-        "https://api.siliconflow.cn/v1/chat/completions",
-        headers={"Authorization": f"Bearer {list(user.sk.values())[user.default]}", "Content-Type": "application/json"},
-        json={
+
+    json_args = {
             "model":f"{list(user.sk.keys())[user.default]}",# default -> "Qwen/Qwen3.5-27B"
             "messages": mes,
             "stream": True,
-            "enable_thinking": ,
-        },
+        }
+
+    to_sent,pre_status,status = "","None","None"
+
+    resp = client.post(
+        "https://api.siliconflow.cn/v1/chat/completions",
+        headers={"Authorization": f"Bearer {list(user.sk.values())[user.default]}", "Content-Type": "application/json"},
+        json=json_args,
         stream=True,
     )
+    
     thinking_con = ""
     con = ""
     print()
@@ -202,7 +264,7 @@ def res():
 """
 
 if __name__ == "__main__" :
-    print(f"\n/m -查询可用模型\n/a -增加模型\n\n当前模型: \n{list(user.sk.keys())[user.default]}\n")
+    print(f"\033[2J/m -查询可用模型\n/a -增加模型\n\n当前模型: \n{list(user.sk.keys())[user.default]}\n")
     while 1:
         u_input = input("you:")
         if u_input == "/m":         #查看可用模型

@@ -147,11 +147,16 @@ class Own:   #之后要单开一个来存储
         elif mdl not in list_model_poor:
             print("你当前所选择的模型不在代金卷名单内\n若要添加, 请输入 /y\n若取消添加, 请输入 /n")
             for turn in range(3,0,-1):   #事不过三
+                
                 u_input = input(f"({turn})you-")
+
                 if u_input ==  "/y":
                     break
                 elif u_input == "/n":
+                    print("\r\033[1A\033[2K添加已取消",flush=True)
+
                     return 0
+                print("\r\033[1A\033[2K",end = "",flush=True)    #回到上一行开头然后清空行
             else:
                 return 0
         skey = input("请输入 api-key\n")
@@ -374,6 +379,7 @@ def main():
 
         mes.append({"role": "user", "content": f"{u_input}"})
         res()
+
 if __name__ == "__main__" :
 
         main()
@@ -387,7 +393,8 @@ todo
     选择模型    complete
     模型详情    complete
     功能开关    complete
-    多模态上传
+    多模态上传  complete
+    进度条      
     skill兼容
 
 """

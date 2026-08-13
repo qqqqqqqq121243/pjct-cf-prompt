@@ -15,26 +15,31 @@ import random
         
 
 # p_moon = P_moon()
-class Loading():
+class Loading(threading.Thread):
     def __init__(self) -> None:
+        super().__init__()
         self.get_res = threading.Event()
         self.pic = ['🌘', '🌗', '🌖', '🌕', '🌔', '🌓', '🌒', '🌑']
+        
+
+    # def hide(self,func):
+    #     def inner():
+    #         print("\033[?25l")
+    #         func()
+    #         print("\033[?25h")
+    #     return inner
+    def run(self):
+        print("\033[?25l",end ="",flush= True)
+        try:
+            count = 0
+            while not self.get_res.is_set():
+                print(f"{self.pic[count%len(self.pic)]}\r",end = "")
+                time.sleep(0.15)
+                count += 1
+        finally:
+            print("\033[?25h",end ="",flush= True)
 
 
-    def hide(self,func):
-        def inner():
-            print("\033[?25l")
-            func()
-            print("\033[?25h")
-        return inner
-
-    @hide
-    def loading(self):
-        count = 0
-        while not self.get_res.is_set():
-            print(f"{self.pic[count%len(self.pic)]}\r",end = "")
-            time.sleep(0.15)
-            count += 1
 
     # def fake_response():
     #     time.sleep(random.randint(3,7))

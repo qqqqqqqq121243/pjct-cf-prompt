@@ -68,11 +68,12 @@ class Own:   #之后要单开一个来存储
         self.tmp_model = None   #用来给增加模型时，暂时存放选择的模型
 
         def print_model(page,tar):
-            print("\033[2H")   #回到左上角
-            to_print =''
+            # print("\033[2H")   #回到左上角
+            to_print ='\033[2J'
             for itx,m in enumerate(tar_list[page * 10 :(page + 1) * 10]):
                 #红色字体(31)，选择框为红色(41)，穷鬼模型为加粗(1)
                 to_print += f"\n\033[{1 if m[-1] == 1 else 0};{41 if tar == itx else 31}m{m[0]} \033[0m - {m[1]}"+50*" "
+            
             print(to_print,end="",flush=True)  
 
             
@@ -153,14 +154,14 @@ class Own:   #之后要单开一个来存储
         if mdl == None :
             return 0 
         elif mdl not in list_model_poor:
-            print("你当前所选择的模型不在代金卷名单内\n\033[2m若要添加, 请输入 /y\n若取消添加, 请输入 /n\033[0m")
+            print("你当前所选择的模型不在代金卷名单内\n\033[2m若要添加, 请输入 y\n若取消添加, 请输入 n\033[0m")
             for turn in range(3,0,-1):   #事不过三
                 
                 u_input = input(f"({turn})you-")
 
-                if u_input ==  "/y":
+                if u_input ==  "y":
                     break
-                elif u_input == "/n":
+                elif u_input == "n":
                     print("\r\033[1A\033[2K添加已取消",flush=True)
 
                     return 0
@@ -168,48 +169,28 @@ class Own:   #之后要单开一个来存储
             else:
                 print("\r\033[2A\033[2K添加已取消\n                      \r",end = "",flush=True)
                 return 0
-        skey = input("请输入 api-key\n")
-                    
+        skey = input("请输入 api-key\n\033[2m输入 / 则使用已有密钥\r\033[5C\033[0m")
+        if skey == "/" :
+            skey = secret_key
+        print('\033[1A验证中                    ',flush=True)
+        loading_animate = Loading()
+        loading_animate.start()
         code = test_sk(mdl,skey)
-
+        loading_animate.get_res.set()
+        loading_animate.join()
         if code:
             self.sk.update({mdl:skey})
             print(f"模型 {mdl} 添加成功")
+        
 
 
 
 user = Own()
 
+from model_config import Model_Config
+model_config = Model_Config(ori_setting)   
 
-class Model_Config :
-    def __init__(self) -> None:
-        # 获得默认设定
-        # with open("O:/project/pjct-cf-prompt/llmloop0.2/data/models_config.json",'r',encoding="utf-8") as f :
-        #     ori_setting = dict(json.load(f))
-        self.user_setting= copy.deepcopy(ori_setting)
-        self.ori_setting = ori_setting
-    
-    # def __call__(self,model_name:str):      #默认返回用户设置
-    #     return self.user_setting.get(model_name,(1,1,1,1))
-    
-    def change_setting(self,args:list,model_name:str):
-        def legal_test(new_args:list,model_name:str) -> bool:         #检查是否设置合法
-            # test_result = map(lambda x : x[1]!= 0 and x[0] == 1 or x[0] == 0, ((usr,syt) for usr,syt in zip(new_args,self.ori_setting.get(model_name,(1,1,1,1)))))
-            test_result = (syt != 0 and usr == 1 or usr == 0 for usr,syt in zip(new_args,self.ori_setting.get(model_name,[1,1,1,1])))
-            if False in test_result:
-                print("illegal setting")
-                return 0
-            print("legal setting")
-            return 1
-
-        if legal_test(args,model_name):
-            self.user_setting[model_name] = args
-            status = "97m ON" if "Thinking" in model_name or args[0] == 1 else "90m OFF"
-            print(f"\033[0;7;97m思考\033[0;1;{status}\033[0m")
-        else:
-            print("设置失败")
-
-model_config = Model_Config()   
+from tools import Tool
 
 
 def api_counter(func):
@@ -267,6 +248,7 @@ def res():
             print(response.status_code)
             return 0
         for line in response.iter_lines():
+
             to_sent = ""
             if not line or not line.startswith(b"data:"):
                 continue
@@ -322,7 +304,7 @@ def res():
 
 
 def main():
-    comand_list = [("/h","查看命令列表"),('/m' ,'查询可用模型'),('/a','增加模型'),('/s' ,'选择模型'),('/t' ,'开关思考'),('/c' ,'清理对话'),('/' ,'文件上传')]
+    comand_list = [("/h","查看命令列表"),('/m' ,'查询可用模型'),('/a','增加模型'),('/s' ,'选择模型'),('/t' ,'开关思考'),('/c' ,'清理对话'),('/n','新建对话'),('/' ,'文件上传')]
     helpful_word = "\n"+"\n".join(["\033[0m"+cmd+"  \033[2m"+wrd+"\033[0m" for cmd,wrd in comand_list])
     print(f"\033[2J{helpful_word}")
     print(f"当前模型 {user.current} {"\033[1m思考\033[0m" if model_config.user_setting[user.current][0] ==1 else "非思考"}")
@@ -360,11 +342,11 @@ def main():
             continue
 
         elif u_input == "/h" or u_input == "/help":
-                comand_list = [("/h","查看命令列表"),('/m' ,'查询可用模型'),('/a','增加模型'),('/s' ,'选择模型'),('/t' ,'开关思考'),('/c' ,'清理对话'),('/' ,'文件上传')]
+                comand_list = [("/h","查看命令列表"),('/m' ,'查询可用模型'),('/a','增加模型'),('/s' ,'选择模型'),('/t' ,'开关思考'),('/c' ,'清理对话'),("/g",'对话管理'),('/' ,'文件上传')]
                 helpful_word = "\n"+"\n".join(["\033[0m"+cmd+"  \033[2m"+wrd+"\033[0m" for cmd,wrd in comand_list])
                 print(f"\033[0m{helpful_word}")
                 input(f"当前模型 {user.current} {"\033[1m思考\033[0m" if model_config.user_setting[user.current][0] ==1 else "非思考"}\n\033[1;7;3m回车以继续\033[0m")
-                print("\r\033[9A"+10*(" "*60+"\n")+"\033[12A"+'        \r',flush=True)
+                print(f"\r\033[{len(comand_list)+5}A"+(len(comand_list)+5)*(" "*60+"\n")+"\033[12A"+'        \r',flush=True,end = "")
                 continue
 
         elif u_input == "/" : #多模态上传
@@ -401,6 +383,11 @@ def main():
         elif u_input == "/p":
             print("\r\033[3J\033[2J",flush=True)
             mmg.print_full_mes(mes.message)
+            continue
+        elif u_input == '/n':
+            mes.new_mes()
+            mes.new_mes = mes.index[-1]
+            print('\033[1A\r         \r',flush=True,end = '')
             continue
 
         elif u_input == "/e" or u_input.startswith("& C:/Users/mahto/python-sdk/python3.13.2/python.exe"):#补丁来的

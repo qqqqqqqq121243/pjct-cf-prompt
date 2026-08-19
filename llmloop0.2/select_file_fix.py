@@ -115,6 +115,7 @@ class Select_File:
         hash_dict = { hashlib.md5(i[-1].encode("utf-8")).hexdigest():i[0][0]+"."+i[0][1] for i in self.file_list if i[0][0] != None}
 
         with open(cache_file,'a+',encoding="utf-8") as f:
+            f.seek(0)
             data = f.read()
             caches = dict(json.loads(data)) if data.strip() != '' else {}
             caches.update(hash_dict)

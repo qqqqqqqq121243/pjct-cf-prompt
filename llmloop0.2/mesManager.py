@@ -95,7 +95,7 @@ class MesManager():
             usr_str = usr
             asi_str = f'\n        \033[2m                            {(asi[:40]).replace('\n','')}...'
             to_print += head_str+usr_str+asi_str+'\n'
-        to_print = '\n\n\033[2J'+to_print +f'\npage:{self.page} cur:{self.cur}'
+        to_print = '\n\n\033[2J'+to_print +f'\npage:{self.page} cur:{self.cur}\n'
         print(to_print,end="\033[0m",flush=True)
         return 0
 
@@ -184,6 +184,7 @@ class MesManager():
             pass
 
     def manage(self):
+        print('\033[1mMesManager已启动\n\033[0;2m    按任意键继续\033[0m\r\033[2A',end = '',flush=True)
         self.confirm = None   # 待确认删除的会话 key
 
         def _press(key):
@@ -191,6 +192,16 @@ class MesManager():
 
             if self.confirm is not None:          # 正在确认删除
                 if key == k.enter:
+
+                    if len(self.mes_list[-1]) == 1:
+                        self.page -= 1
+                        if len(self.mes_list) == 1:
+                            print('\033[1;7m至少需要存在一次对话\033[0m',end ='',flush=True)
+                            self.confirm = None
+                            time.sleep(2)
+                            print('\r'+40*' ',end = '\r',flush=True)
+                            self.page = 0
+                            
                     self.mes.dele(self.confirm)
                     self.confirm = None
                     self.mes_list = self._mes_list()
@@ -203,6 +214,7 @@ class MesManager():
                 return False
             elif key == k.enter:
                 self.queue.append(self.mes_list[self.page][self.cur][0])
+                print("\033[2J\033[3J\033[H")
                 return False
             elif key == k.backspace:
                 self.confirm = self.mes_list[self.page][self.cur][0]
@@ -220,8 +232,15 @@ class MesManager():
             if self.confirm is None:
                 self.print_mes(self.mes_list[self.page])
 
+        
+
         self.listener = keyboard.Listener(on_press=_press, suppress=True)
         self.mes_list = self._mes_list()
+        if len(self.mes_list) == 0:
+            print('\033[1;7m没有对话\033[0m',end ='',flush=True)
+            time.sleep(2)
+            print('\r'+40*' ',end = '\r',flush=True)
+            return None
         self.listener.start()
         self.listener.join()
         return self.queue.pop()
@@ -260,6 +279,7 @@ class Mes :    #这个我先暂时搁置
 
     def dele(self,index):            #给mesManager用的
         self.data.pop(index, None)
+        
         if index == self.now_index:
             self.new_mes()               # 删的是当前会话，就新建一个空的
             self.now_index = self.index[-1]
